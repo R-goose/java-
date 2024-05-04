@@ -1,10 +1,24 @@
 package sample;
 
+import Deque.NodeList;
+import DrawPane.DrawPane;
+import DrawPane.*;
+import Tree.TreeUtil;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.SplitPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class Controller {
+
+    public static Stage primarystage;
+    public static BorderPane pane;
 
     @FXML
     private Button fillingColor;
@@ -107,14 +121,22 @@ public class Controller {
 
     @FXML
     void newNode(ActionEvent event) {
-
+        if(NodeList.list.isEmpty()){
+            TreeUtil.creatRoot();
+            DrawPane.draw();
+            try{
+                MyTreeView.setTreeView();
+            }catch (Exception e1){
+                e1.printStackTrace();
+            }
+        }
     }
 
 
 
     @FXML
     void deleteNode(ActionEvent event) {
-
+        System.out.println("ok");
     }
 
 
@@ -173,6 +195,5 @@ public class Controller {
     void rightHide(ActionEvent event) {
 
     }
-
 
 }
