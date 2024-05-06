@@ -1,6 +1,7 @@
 package Deque;
 
 import Tree.TreeNode;
+import sample.Controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +96,7 @@ public class NodeList {
             for(int i=0;i<list.size();i++){
                 walkNode(list.get(i));
                 if(i<list.size()-1)
-                    height+=NodePos.marginY;
+                    height+= Controller.marginY;
             }
         }else{//如果当前节点不是根节点，则直接调用方法计算高度
             walkNode(p);
@@ -120,7 +121,7 @@ public class NodeList {
             }
             //在累加完一个子节点的高度后，考虑节点的间距
             if(i<p.getNodeChildren().size()-1){
-                height+=NodePos.marginY;
+                height+=Controller.marginY;
             }
         }
         //如果当前节点没有子节点，将当前节点的高度加到总高度中

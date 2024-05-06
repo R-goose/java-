@@ -127,7 +127,7 @@
             <DropShadow color="#aba9a9" height="29.19" offsetX="1.0" offsetY="2.0" radius="11.245000000000001" spread="0.03" width="17.79" />
          </effect>
       </Pane>
-      <Pane layoutY="105.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="251.0" style="-fx-background-color: #F9F9F9; -fx-background-radius: 0 24 24 0;" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="1009.0" AnchorPane.topAnchor="105.0">
+      <Pane layoutY="105.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="247.0" style="-fx-background-color: #F9F9F9; -fx-background-radius: 0 24 24 0;" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="1009.0" AnchorPane.topAnchor="105.0">
          <effect>
             <DropShadow color="#8a8787" height="12.1" radius="12.965" width="41.76" />
          </effect>
@@ -298,11 +298,6 @@
             </Button>
          </children>
       </Pane>
-      <Pane fx:id="drawPane" layoutX="260.0" layoutY="105.0" prefHeight="720.0" prefWidth="760.0" style="-fx-background-color: #ffffff;">
-         <effect>
-            <DropShadow blurType="TWO_PASS_BOX" color="#aeaeae" height="38.05" radius="20.935" spread="0.35" width="47.69" />
-         </effect>
-      </Pane>
       <Pane layoutX="1030.0" layoutY="105.0" prefHeight="720.0" prefWidth="230.0" style="-fx-background-color: #F9F9F9; -fx-background-radius: 24 0 0 24;">
          <effect>
             <DropShadow color="#b2b0b0" height="10.62" radius="5.922499999999999" spread="0.51" width="15.07" />
@@ -328,5 +323,6 @@
             </Button>
          </children>
       </Pane>
+      <Pane fx:id="drawPane" layoutX="268.0" layoutY="105.0" prefHeight="719.0" prefWidth="751.0" />
    </children>
 </AnchorPane>

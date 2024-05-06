@@ -11,6 +11,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import sample.Controller;
 
 // 显示带有文本框的窗口，编辑节点相关内容，重新绘制相关视图
 public class MyTextArea {
@@ -53,12 +54,12 @@ public class MyTextArea {
                     node.setTxt(str);
 
                     // 重新应用CSS样式、布局和绘制相关视图
-                    DrawPane.g.applyCss();
-                    DrawPane.g.layout();
+                    Controller.g.applyCss();
+                    Controller.g.layout();
                     CheckPane.controlPane();
                     NodePos.posX(NodeList.getRoot());
                     NodePos.posY(NodeList.getRoot());
-                    DrawPane.draw();
+                    Controller.draw();
 
                     // 更新TreeView
                     try {

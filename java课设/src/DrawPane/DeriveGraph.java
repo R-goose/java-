@@ -11,7 +11,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.WritableImage;
 
-// 从树状图中导出图形并保存为图片文件
+/**
+ * 从树状图中导出图形
+ * 并保存为图片
+ */
+
+
 public class DeriveGraph {
     // 设置图形与边界的间距
     public static int padding = 50;

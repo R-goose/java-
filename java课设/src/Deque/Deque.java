@@ -4,7 +4,7 @@ import Tree.*;
 import java.util.ArrayList;
 import java.util.List;
 import DrawPane.*;
-
+import sample.*;
 
 public class Deque {
     //定义队列的最大容量
@@ -124,9 +124,9 @@ public class Deque {
             n.setPos(list.get(i).getPos());
             n.setImagPath(list.get(i).getImagPath());
             //将节点添加到画布上
-            DrawPane.g.getChildren().add(n);
-            DrawPane.g.applyCss();
-            DrawPane.g.layout();
+            Controller.g.getChildren().add(n);
+            Controller.g.applyCss();
+            Controller.g.layout();
             //避免出现界面混乱或重叠的情况，有利于保持界面的清晰性和整洁性
             //注意一下这段代码的逻辑，为什么需要将子节点进行清空
             //MyDrawPane.g.getChildren().clear();
