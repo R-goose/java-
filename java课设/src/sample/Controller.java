@@ -25,6 +25,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.List;
 
 public class Controller {
 
@@ -34,6 +35,8 @@ public class Controller {
     public static Group g = new Group();
     public static ScrollPane sp = new ScrollPane();
     public static TreeNode mouseNode = new TreeNode();
+    public static int item = 1;
+
 
     @FXML
     private Button fillingColor;
@@ -84,10 +87,10 @@ public class Controller {
     private Button newNode;
 
     @FXML
-    private Button fontSize;
+    private Button son;
 
     @FXML
-    private Button fontColor;
+    private Button brother;
 
     @FXML
     public  Pane drawPane=new Pane();
@@ -143,33 +146,63 @@ public class Controller {
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
-            fontColor.setDisable(false);
-            fontSize.setDisable(false);
+            newNode.setDisable(true);
+            son.setDisable(false);
+            brother.setDisable(false);
         }
     }
 
 
     @FXML
     void deleteNode(ActionEvent event) {
-        System.out.println("ok");
+        son.setDisable(true);
+        brother.setDisable(true);
+        deleteNode.setDisable(true);
+        TreeNode node=mouseNode;
+        deleteNode(node);
+        if(NodeList.list.isEmpty()){
+            newNode.setDisable(false);
+            son.setDisable(true);
+            brother.setDisable(true);
+            deleteNode.setDisable(true);
+        }
+        SelectItem();
+        posX(NodeList.getRoot());
+        posY(NodeList.getRoot());
+        draw();
     }
 
 
     @FXML
     void left_layout(ActionEvent event) {
-
+        item = 2;
+        SelectItem();
+        posX(NodeList.getRoot());
+        posY(NodeList.getRoot());
+//        CheckPane.controlPane();
+        draw();
     }
 
 
     @FXML
     void right_layout(ActionEvent event) {
-
+        item = 3;
+        SelectItem();
+        posX(NodeList.getRoot());
+        posY(NodeList.getRoot());
+//        CheckPane.controlPane();
+        draw();
     }
 
 
     @FXML
     void center_layout(ActionEvent event) {
-
+        item = 1;
+        SelectItem();
+//        CheckPane.controlPane();
+        posX(NodeList.getRoot());
+        posY(NodeList.getRoot());
+        draw();
     }
 
 
@@ -187,12 +220,13 @@ public class Controller {
 
     //增加子节点
     @FXML
-    void fontSize(ActionEvent event) {
+    void son(ActionEvent event) {
         System.out.println("增加子节点");
         TreeNode node=mouseNode;
         System.out.println(node.getNid());
         System.out.println(node.getPid());
         addNode(node);
+        SelectItem();
         posX(NodeList.getRoot());
         posY((NodeList.getRoot()));
         draw();
@@ -201,11 +235,12 @@ public class Controller {
 
     //增加同级节点
     @FXML
-    void fontColor(ActionEvent event) {
+    void brother(ActionEvent event) {
         System.out.println("增加同级节点");
         TreeNode node=mouseNode;
         TreeNode p=NodeList.getParent(node);
         addNode(p);
+        SelectItem();
         posX(NodeList.getRoot());
         posY(NodeList.getRoot());
         draw();
@@ -229,13 +264,14 @@ public class Controller {
      */
 
     public void initialize() {
-        draw();
+//        draw();
         drawPane.getChildren().add(g);
         Click();
         doubleClick();
         if(NodeList.list.isEmpty()){
-            fontColor.setDisable(true);
-            fontSize.setDisable(true);
+            son.setDisable(true);
+            brother.setDisable(true);
+            deleteNode.setDisable(true);
         }
     }
 
@@ -521,8 +557,18 @@ public class Controller {
         //单击事件：监控节点和按钮，进行相应操作
         public  void Click() {
             drawPane.setOnMouseClicked(event -> {
+                if(!NodeList.list.isEmpty()) {
+                    newNode.setDisable(true);
+                    son.setDisable(true);
+                    brother.setDisable(true);
+                    deleteNode.setDisable(true);
+//                    MyButtonBar.b4.setDisable(true);
+//                    MyButtonBar.b6.setDisable(true);
+//                    MyButtonBar.b7.setDisable(true);
+                }
+
 //			System.out.println("isclick");
-//			 double x1 = event.getX();
+//			 double x1 = event.getX()
 //		     double y1 = event.getY();
                 double x = event.getSceneX();
                 double y = event.getSceneY();
@@ -557,16 +603,21 @@ public class Controller {
 //                            MyButtonBar.b7.setDisable(false);
 //                            MyButtonBar.b6.setDisable(true);
 //                        }
-//                        MyButtonBar.b1.setDisable(true);
-//                        MyButtonBar.b2.setDisable(false);
-//                        MyButtonBar.b4.setDisable(false);
+                        newNode.setDisable(true);
+                        son.setDisable(false);
+                        deleteNode.setDisable(false);
 //                        MyButtonBar.b5.setDisable(false);
 //                        MyButtonBar.b6.setDisable(false);
                        if(mouseNode != NodeList.getRoot()) {
-                           fontColor.setDisable(false);
+                           brother.setDisable(false);
                        }else
                        {
-                           fontColor.setDisable(true);
+                           brother.setDisable(true);
+                       }
+                       if(!NodeList.list.isEmpty()){
+                           newNode.setDisable(true);
+                       }else{
+                           newNode.setDisable(false);
                        }
 //                        else MyButtonBar.b3.setDisable(true);
                     }
@@ -697,9 +748,98 @@ public class Controller {
         }
     }
 
+    public static void deleteNode(TreeNode node) {
+        //删除node父亲孩子list中的的结点
+        //System.out.println(888);
+        TreeNode p = NodeList.getParent(node);
+        System.out.println(p.getNodeChildren().size());
+        for(int i = 0;i < p.getNodeChildren().size();i++) {
+            if(node.getNid() == p.getNodeChildren().get(i).getNid()) {
+                p.getNodeChildren().remove(i);
+                break;
+            }
+        }
+        System.out.println(p.getNodeChildren().size());
+        deleteChildren(node);
+
+    }
+
+    private static void deleteChildren(TreeNode node) {
+        for(int i = 0;i < NodeList.list.size();i++) {
+            if(NodeList.list.get(i).getNid() == node.getNid()) {
+                NodeList.list.remove(i);
+            }
+        }
+        //删除list中node所有的子结点
+        if(!node.getNodeChildren().isEmpty()) {
+            for(int i = 0;i < node.getNodeChildren().size(); i++) {
+                deleteChildren(node.getNodeChildren().get(i));
+            }
+            //System.out.println("孩子不空");
+        }
     }
 
 
 /**
- * 按钮打开与关闭状态
+ * 关于布局
+ * 居中，左，右布局
  */
+public static void SelectItem() {
+    if(item==1) {
+        for(int i = 0; i<NodeList.list.size();i++) {
+            TreeNode node = new TreeNode();
+            node = NodeList.list.get(i);
+            //System.out.println("ChildHeight:"+NodeList.getChildHeight(node, node.getPos()));
+            if(NodeList.getParent(node)==NodeList.getRoot()) {
+                Balance();
+            }
+            else {
+                node.setPos(NodeList.getParent(node).getPos());
+            }
+        }
+    }
+    if(item==2) {
+        for(int i = 0; i<NodeList.list.size();i++) {
+            TreeNode node = new TreeNode();
+            node = NodeList.list.get(i);
+            node.setPos(0);
+        }
+    }
+    if(item==3) {
+        for(int i = 0; i<NodeList.list.size();i++) {
+            TreeNode node = new TreeNode();
+            node = NodeList.list.get(i);
+            node.setPos(1);
+        }
+    }
+}
+
+    //节点平衡逻辑
+    public static void Balance() {
+        List<TreeNode> node = NodeList.getRoot().getNodeChildren();
+        int length = node.size();
+        double sum = 0;
+        int max = 0;
+        double[] height = new double[length];
+//		 int[] left = new int[length/2+1];
+        for(int i = 0;i < length;i++) {
+            height[i] = NodeList.getChildHeight(node.get(i), node.get(i).getPos());
+            if(height[i] > height[max])
+                max = i;
+            sum+=height[i];
+        }
+//		 left[0] = max;
+        node.get(max).setPos(0);
+        double nowsum = height[max];
+        for(int i = 0;i < length;i++) {
+            if(i!=max) {
+                if(height[i]+nowsum<=sum/2+42) {
+                    node.get(i).setPos(0);
+                    nowsum+=height[i];
+                }
+                else node.get(i).setPos(1);
+            }
+        }
+    }
+
+}

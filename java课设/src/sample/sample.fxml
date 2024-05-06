@@ -137,7 +137,7 @@
                   <DropShadow color="#868484" height="12.1" radius="5.55" width="12.1" />
                </effect>
                <children>
-                  <Button fx:id="newNode" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="14.0" lineSpacing="1.0" mnemonicParsing="false" onAction="#newNode" prefHeight="38.0" prefWidth="115.0" style="-fx-background-color: #ffffff; -fx-background-radius: 50;" text="新增节点" textAlignment="CENTER">
+                  <Button fx:id="newNode" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="14.0" lineSpacing="1.0" mnemonicParsing="false" onAction="#newNode" prefHeight="38.0" prefWidth="115.0" style="-fx-background-color: #ffffff; -fx-background-radius: 50;" text="创建节点" textAlignment="CENTER">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
@@ -253,7 +253,7 @@
             </Pane>
             <Pane layoutX="6.0" layoutY="411.0" prefHeight="122.0" prefWidth="194.0" style="-fx-background-color: #10565E; -fx-background-radius: 27;">
                <children>
-                  <Button fx:id="fontSize" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="14.0" lineSpacing="1.0" mnemonicParsing="false" onAction="#fontSize" prefHeight="38.0" prefWidth="115.0" style="-fx-background-color: #ffffff; -fx-background-radius: 50;" text="字体大小" textAlignment="CENTER">
+                  <Button fx:id="son" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="14.0" lineSpacing="1.0" mnemonicParsing="false" onAction="#son" prefHeight="38.0" prefWidth="115.0" style="-fx-background-color: #ffffff; -fx-background-radius: 50;" text="增加子节点" textAlignment="CENTER">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
@@ -267,7 +267,7 @@
                         <Insets bottom="6.0" right="2.0" />
                      </opaqueInsets>
                   </Button>
-                  <Button fx:id="fontColor" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="70.0" lineSpacing="1.0" mnemonicParsing="false" onAction="#fontColor" prefHeight="38.0" prefWidth="115.0" style="-fx-background-color: #ffffff; -fx-background-radius: 50;" text="字体颜色" textAlignment="CENTER">
+                  <Button fx:id="brother" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="70.0" lineSpacing="1.0" mnemonicParsing="false" onAction="#brother" prefHeight="38.0" prefWidth="115.0" style="-fx-background-color: #ffffff; -fx-background-radius: 50;" text="增加同级节点" textAlignment="CENTER">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
