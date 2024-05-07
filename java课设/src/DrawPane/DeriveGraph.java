@@ -10,6 +10,8 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Pane;
+import sample.Controller;
 
 /**
  * 从树状图中导出图形
@@ -18,17 +20,18 @@ import javafx.scene.image.WritableImage;
 
 
 public class DeriveGraph {
-    // 设置图形与边界的间距
+    // 定义填充量
     public static int padding = 50;
-    // 初始化左侧和右侧节点
+    // 左边界节点
     public static TreeNode left = new TreeNode();
+    //右边界节点
     public static TreeNode right = new TreeNode();
     // 初始化顶部和底部节点
     private static TreeNode top = new TreeNode();
     private static TreeNode bottom = new TreeNode();
 
     // 计算出图形的起始点坐标以及图形的宽度和高度
-    public static void deriveGraph(File file) throws Exception {
+    public static void deriveGraph(File file,Pane drawPane) throws Exception {
         // 重置节点的点击状态
         for (int i = 0; i < NodeList.list.size(); i++) {
             TreeNode node = NodeList.list.get(i);
@@ -44,13 +47,13 @@ public class DeriveGraph {
         int y = (int) top.getTop() - DeriveGraph.padding;
 
         // 获取可视区域截图
-        WritableImage wi = DrawPane.g.snapshot(null, null);
+        WritableImage wi = Controller.g.snapshot(null, null);
         // 计算图形的实际高度和宽度
         double height = wi.getHeight() + DeriveGraph.padding * 2;
         double width = wi.getWidth() + DeriveGraph.padding * 2;
 
         // 从整个绘图区域中截取图形部分
-        WritableImage wi1 = DrawPane.drawPane.snapshot(null, null);
+        WritableImage wi1 = drawPane.snapshot(null, null);
         WritableImage wi2 = new WritableImage(wi1.getPixelReader(), x, y, (int) width, (int) height);
 
         // 将截取的图形转换为BufferedImage并保存为png文件

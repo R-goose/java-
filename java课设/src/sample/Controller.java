@@ -31,9 +31,10 @@ public class Controller {
 
     private static int id=1;
 
+    public static ScrollPane sp2=new ScrollPane();
     public static int fontsize = 20;
     public static Group g = new Group();
-    public static ScrollPane sp = new ScrollPane();
+
     public static TreeNode mouseNode = new TreeNode();
     public static int item = 1;
 
@@ -99,6 +100,9 @@ public class Controller {
     public AnchorPane ap;
 
     @FXML
+    public ScrollPane sp;
+
+    @FXML
     void setting(ActionEvent event) {
         System.out.println(666);
     }
@@ -142,7 +146,8 @@ public class Controller {
     @FXML
     void newNode(ActionEvent event) {
         if (NodeList.list.isEmpty()) {
-            TreeUtil.creatRoot(drawPane);
+            TreeUtil.creatRoot(drawPane,sp);
+
             draw();
             try {
                 setTreeView(ap);
@@ -170,6 +175,7 @@ public class Controller {
             deleteNode.setDisable(true);
         }
         SelectItem();
+        CheckPane.controlPane(drawPane,sp);
         posX(NodeList.getRoot());
         posY(NodeList.getRoot());
         try {
@@ -185,9 +191,10 @@ public class Controller {
     void left_layout(ActionEvent event) {
         item = 2;
         SelectItem();
+
         posX(NodeList.getRoot());
         posY(NodeList.getRoot());
-//        CheckPane.controlPane();
+        CheckPane.controlPane(drawPane,sp);
         draw();
     }
 
@@ -198,7 +205,7 @@ public class Controller {
         SelectItem();
         posX(NodeList.getRoot());
         posY(NodeList.getRoot());
-//        CheckPane.controlPane();
+        CheckPane.controlPane(drawPane,sp);
         draw();
     }
 
@@ -235,6 +242,7 @@ public class Controller {
         System.out.println(node.getPid());
         TreeUtil.addNode(node);
         SelectItem();
+        CheckPane.controlPane(drawPane,sp);
         posX(NodeList.getRoot());
         posY((NodeList.getRoot()));
         try {
@@ -254,6 +262,7 @@ public class Controller {
         TreeNode p=NodeList.getParent(node);
         TreeUtil.addNode(p);
         SelectItem();
+        CheckPane.controlPane(drawPane,sp);
         posX(NodeList.getRoot());
         posY(NodeList.getRoot());
         try {
@@ -283,6 +292,12 @@ public class Controller {
 
     public void initialize() {
 //        draw();
+
+        sp.setContent(drawPane);
+        drawPane.setMinWidth(1500);
+        drawPane.setMinHeight(1000);
+        sp.setHvalue(0.5);
+        sp.setVvalue(0.5);
         drawPane.getChildren().add(g);
         Click();
         doubleClick();
@@ -696,7 +711,7 @@ public class Controller {
                         // 重新应用CSS样式、布局和绘制相关视图
                         Controller.g.applyCss();
                         Controller.g.layout();
-                        CheckPane.controlPane();
+                        CheckPane.controlPane(drawPane,sp);
                         posX(NodeList.getRoot());
                         posY(NodeList.getRoot());
                         Controller.draw();

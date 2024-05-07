@@ -13,6 +13,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Line;
+import sample.Controller;
+
 import java.awt.*;
 
 //实现绘制节点和连线的功能
@@ -155,7 +157,7 @@ public class DrawPane extends ScrollPane {
     //重新绘制整个图形界面
     public static void redraw() {
         //清空绘图面板中的所有节点和连线
-        DrawPane.g.getChildren().clear();
+        Controller.g.getChildren().clear();
 
         //遍历节点列表
         for(int i = 0; i<NodeList.list.size();i++) {
@@ -179,9 +181,9 @@ public class DrawPane extends ScrollPane {
             node.setFont(new Font("Arial",20));
 
             //将节点添加到绘图面板中
-            DrawPane.g.getChildren().add(node);
-            DrawPane.g.applyCss();
-            DrawPane.g.layout();
+            Controller.g.getChildren().add(node);
+            Controller.g.applyCss();
+            Controller.g.layout();
 
             //设置节点的布局位置为预先计算好的位置
             node.setLayoutX(node.getLeft());

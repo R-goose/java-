@@ -55,7 +55,7 @@ public class MyTextArea {
                     // 重新应用CSS样式、布局和绘制相关视图
                     Controller.g.applyCss();
                     Controller.g.layout();
-                    CheckPane.controlPane();
+//                    CheckPane.controlPane();
 //                    NodePos.posX(NodeList.getRoot());
 //                    NodePos.posY(NodeList.getRoot());
                     Controller.draw();

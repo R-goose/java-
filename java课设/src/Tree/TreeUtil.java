@@ -5,6 +5,7 @@ import DrawPane.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import DrawPane.*;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 import sample.Controller;
 
@@ -16,7 +17,7 @@ public class TreeUtil {
     private static int id=1;
 
     //创建根节点的方法
-    public static void creatRoot(Pane drawPane){
+    public static void creatRoot(Pane drawPane, ScrollPane sp){
         //创建根节点对象，并设置唯一标识和标题
         TreeNode node = new TreeNode(0,"双击输入");
         //设置节点的唯一标识id并自增
@@ -31,7 +32,7 @@ public class TreeUtil {
         //将根节点添加到节点列表中，永固管理所有节点
         NodeList.list.add(node);
         //控制面板更新，以便在界面上反映节点的变化
-        CheckPane.controlPane();
+        CheckPane.controlPane(drawPane,sp);
         node.setLeft(drawPane.getWidth() / 2 - node.getWidth() / 2);
         node.setTop(drawPane.getHeight() / 2 - node.getHeight() / 2);
     }
