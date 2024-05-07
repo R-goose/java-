@@ -1,10 +1,11 @@
 package Tree;
 
-import Deque.NodeList;
-import DrawPane.DrawPane;
+import Deque.*;
+import DrawPane.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import DrawPane.*;
+import javafx.scene.layout.Pane;
 import sample.Controller;
 
 /**
@@ -15,7 +16,7 @@ public class TreeUtil {
     private static int id=1;
 
     //创建根节点的方法
-    public static void creatRoot(){
+    public static void creatRoot(Pane drawPane){
         //创建根节点对象，并设置唯一标识和标题
         TreeNode node = new TreeNode(0,"双击输入");
         //设置节点的唯一标识id并自增
@@ -31,6 +32,8 @@ public class TreeUtil {
         NodeList.list.add(node);
         //控制面板更新，以便在界面上反映节点的变化
         CheckPane.controlPane();
+        node.setLeft(drawPane.getWidth() / 2 - node.getWidth() / 2);
+        node.setTop(drawPane.getHeight() / 2 - node.getHeight() / 2);
     }
     public static void addNode(TreeNode p) {
         TreeNode node = new TreeNode(p.getNid(),"分支主题");
@@ -41,10 +44,42 @@ public class TreeUtil {
         Controller.g.applyCss();
         Controller.g.layout();
         if(p.getPos()==1) {
-            node.setLeft(p.getLeft() + p.getWidth() + Controller.marginX);
+            node.setLeft(p.getLeft() + p.getWidth() + NodePos.marginX);
         }else{
-            node.setLeft(p.getLeft() - node.getWidth() - Controller.marginX);
+            node.setLeft(p.getLeft() - node.getWidth() - NodePos.marginX);
         }
+    }
+
+    public static void deleteNode(TreeNode node) {
+        //删除node父亲孩子list中的的结点
+        //System.out.println(888);
+        TreeNode p = NodeList.getParent(node);
+        System.out.println(p.getNodeChildren().size());
+        for(int i = 0;i < p.getNodeChildren().size();i++) {
+            if(node.getNid() == p.getNodeChildren().get(i).getNid()) {
+                p.getNodeChildren().remove(i);
+                break;
+            }
+        }
+        System.out.println(p.getNodeChildren().size());
+        deleteChildren(node);
+
+    }
+
+    private static void deleteChildren(TreeNode node) {
+        for(int i = 0;i < NodeList.list.size();i++) {
+
+            if(NodeList.list.get(i).getNid() == node.getNid()) {
+                NodeList.list.remove(i);
+            }
+        }
+        //删除list中node所有的子结点
+        if(!node.getNodeChildren().isEmpty()) {
+            for(int i = 0;i < node.getNodeChildren().size(); i++) {
+                deleteChildren(node.getNodeChildren().get(i));
+            }
+        }
+
     }
 
 }

@@ -1,11 +1,11 @@
 package sample;
 
-import Deque.Deque;
-import Deque.NodeList;
+import Deque.*;
 //import DrawPane.DrawPane;
 import DrawPane.*;
 import Tree.TreeNode;
 //import Tree.TreeUtil;
+import Tree.TreeUtil;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -93,7 +93,10 @@ public class Controller {
     private Button brother;
 
     @FXML
-    public  Pane drawPane=new Pane();
+    public  Pane drawPane;
+
+    @FXML
+    public AnchorPane ap;
 
     @FXML
     void setting(ActionEvent event) {
@@ -139,10 +142,10 @@ public class Controller {
     @FXML
     void newNode(ActionEvent event) {
         if (NodeList.list.isEmpty()) {
-            creatRoot();
+            TreeUtil.creatRoot(drawPane);
             draw();
             try {
-                MyTreeView.setTreeView();
+                setTreeView(ap);
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
@@ -159,7 +162,7 @@ public class Controller {
         brother.setDisable(true);
         deleteNode.setDisable(true);
         TreeNode node=mouseNode;
-        deleteNode(node);
+        TreeUtil.deleteNode(node);
         if(NodeList.list.isEmpty()){
             newNode.setDisable(false);
             son.setDisable(true);
@@ -169,6 +172,11 @@ public class Controller {
         SelectItem();
         posX(NodeList.getRoot());
         posY(NodeList.getRoot());
+        try {
+            setTreeView(ap);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
         draw();
     }
 
@@ -225,10 +233,15 @@ public class Controller {
         TreeNode node=mouseNode;
         System.out.println(node.getNid());
         System.out.println(node.getPid());
-        addNode(node);
+        TreeUtil.addNode(node);
         SelectItem();
         posX(NodeList.getRoot());
         posY((NodeList.getRoot()));
+        try {
+            setTreeView(ap);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
         draw();
     }
 
@@ -239,10 +252,15 @@ public class Controller {
         System.out.println("增加同级节点");
         TreeNode node=mouseNode;
         TreeNode p=NodeList.getParent(node);
-        addNode(p);
+        TreeUtil.addNode(p);
         SelectItem();
         posX(NodeList.getRoot());
         posY(NodeList.getRoot());
+        try {
+            setTreeView(ap);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
         draw();
     }
 
@@ -458,6 +476,7 @@ public class Controller {
     public static int marginY = 20;   //表示节点在Y轴上的边距
 
     //用于计算节点在X轴上的位置
+
     public void posX(TreeNode node) {
         //判断是否为根节点，如果不是根节点
         //则获取其父节点并根据节点在父节点中的位置确认当前节点在X轴上的位置
@@ -841,5 +860,69 @@ public static void SelectItem() {
             }
         }
     }
+
+    public static void setTreeView(AnchorPane ap) throws IOException {
+        // 创建 TreeView 实例
+        TreeView<Label> treeview = new TreeView<Label>();
+
+        // 获取根节点
+        TreeNode node = NodeList.getRoot();
+
+        // 创建根节点的标签
+        Label label = new Label(node.getTxt());
+        label.setMaxWidth(150); // 设置最大宽度
+        label.setPrefWidth(100); // 设置首选宽度
+        label.setTextOverrun(OverrunStyle.ELLIPSIS); // 设置文本溢出样式
+
+        // 创建根 TreeItem
+        TreeItem<Label> root = new TreeItem<Label>(label);
+        treeview.setRoot(root); // 设置根节点
+
+        // 如果根节点有图片路径，则在标签文本后添加图片提示
+        if (node.getImagPath() != null) {
+            label.setText(node.getTxt() + "\n" + "(图片)");
+            label.setTextAlignment(TextAlignment.CENTER); // 设置文本居中对齐
+        }
+        label.setTextOverrun(OverrunStyle.CENTER_WORD_ELLIPSIS); // 设置文本溢出样式为居中单词省略
+        walk(root, node); // 递归构建树形视图
+        if (NodeList.list.isEmpty()) {
+            root = null; // 若节点列表为空，则将根节点置为 null
+            treeview.setRoot(root); // 设置根节点
+        }
+
+        // 创建标签提示
+        Tooltip tooltip = new Tooltip(node.getText());
+        Tooltip.install(label, tooltip);
+
+        // 设置 TreeView 的宽度和最小高度
+        treeview.setPrefWidth(200);
+        treeview.setMinHeight(570);
+
+        ap.getChildren().addAll(treeview); // 将 TreeView 添加到 AnchorPane 中
+    }
+
+    // 递归构建树形视图方法
+    public static void walk(TreeItem<Label> root, TreeNode node) {
+        for (int i = 0; i < node.getNodeChildren().size(); i++) {
+            TreeNode childnode = node.getNodeChildren().get(i);
+            Label label = new Label(childnode.getTxt());
+            label.setPrefWidth(100); // 设置标签宽度
+            label.setPrefHeight(30); // 设置标签高度
+            label.setTextOverrun(OverrunStyle.CENTER_WORD_ELLIPSIS); // 设置文本溢出样式为居中单词省略
+            if (childnode.getImagPath() != null) {
+                label.setText(childnode.getTxt() + "\n" + "(图片)");
+                label.setTextAlignment(TextAlignment.CENTER); // 设置文本居中对齐
+            }
+            Tooltip tooltip = new Tooltip(childnode.getText());
+            Tooltip.install(label, tooltip); // 设置标签提示
+            TreeItem<Label> child = new TreeItem<Label>(label);
+            root.getChildren().add(child); // 将子 TreeItem 添加到父节点
+            root.setExpanded(true); // 展开父节点
+            walk(child, childnode); // 递归构建树形视图
+        }
+    }
+
+
+
 
 }

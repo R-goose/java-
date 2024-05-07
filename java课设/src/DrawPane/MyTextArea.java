@@ -1,7 +1,6 @@
 package DrawPane;
 
-import Deque.NodeList;
-import Deque.NodePos;
+import Deque.*;
 import Tree.TreeNode;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -57,8 +56,8 @@ public class MyTextArea {
                     Controller.g.applyCss();
                     Controller.g.layout();
                     CheckPane.controlPane();
-                    NodePos.posX(NodeList.getRoot());
-                    NodePos.posY(NodeList.getRoot());
+//                    NodePos.posX(NodeList.getRoot());
+//                    NodePos.posY(NodeList.getRoot());
                     Controller.draw();
 
                     // 更新TreeView

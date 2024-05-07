@@ -1,7 +1,7 @@
 package sample;
 
 //import DrawPane.DrawPane;
-import DrawPane.MyTreeView;
+import DrawPane.*;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

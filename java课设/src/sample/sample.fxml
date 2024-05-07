@@ -310,7 +310,6 @@
             </Text>
          </children>
          <children>
-            <Pane layoutX="15.0" layoutY="35.0" prefHeight="673.0" prefWidth="200.0" />
             <ImageView fitHeight="38.0" fitWidth="37.0" layoutX="14.0" layoutY="360.0" rotate="180.0">
                <image>
                   <Image url="@arrowleft.png" />
@@ -321,6 +320,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
+            <AnchorPane fx:id="ap" layoutX="15.0" layoutY="33.0" prefHeight="681.0" prefWidth="200.0" />
          </children>
       </Pane>
       <Pane fx:id="drawPane" layoutX="268.0" layoutY="105.0" prefHeight="719.0" prefWidth="751.0" />

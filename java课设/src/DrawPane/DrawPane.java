@@ -1,7 +1,6 @@
 package DrawPane;
 
-import Deque.Deque;
-import Deque.NodeList;
+import Deque.*;
 import Tree.*;
 import javafx.scene.Group;
 import javafx.scene.control.ContentDisplay;
@@ -29,7 +28,7 @@ public class DrawPane extends ScrollPane {
         drawPane.setMinWidth(1500);   //设置绘图面板的最小宽度
         drawPane.setMinHeight(1000);  //设置绘图面板的最小高度
         sp=this;  //将当前滚动面板赋值给变量sp
-        draw();
+//        draw();
         this.setVvalue(0.5);             //垂直滚动条位置
         this.setHvalue(0.5);             //水平滚动条位置
         drawPane.getChildren().add(g);   //将绘制内容添加到绘制图版
@@ -37,7 +36,7 @@ public class DrawPane extends ScrollPane {
 
     //绘图方法
     //在绘制面板上绘制结点和连线，处理结点的样式和布局
-    public static void draw(){
+    public static void draw(Pane drawPane){
         //清空群组中的所有子节点
         DrawPane.g.getChildren().clear();
         //将节点列表中的节点插入双端队列中

@@ -2,6 +2,7 @@ package Deque;
 
 import DrawPane.DrawPane;
 import Tree.TreeNode;
+import javafx.scene.layout.Pane;
 
 /**
  * 计算树形结构节点位置
@@ -13,7 +14,7 @@ public class NodePos {
     public static int marginY=20;   //表示节点在Y轴上的边距
 
     //用于计算节点在X轴上的位置
-    public static void posX(TreeNode node){
+    public static void posX(TreeNode node, Pane drawPane){
         //判断是否为根节点，如果不是根节点
         //则获取其父节点并根据节点在父节点中的位置确认当前节点在X轴上的位置
         if(node.getPid()!=0){
@@ -30,12 +31,12 @@ public class NodePos {
         }
         //对当前节点的子节点进行递归调用，计算他们在X轴上的位置
         for(int i=0;i<node.getNodeChildren().size();i++){
-            posX(node.getNodeChildren().get(i));
+            posX(node.getNodeChildren().get(i),drawPane);
         }
     }
 
     //计算节点在Y轴上的位置
-    public static void posY(TreeNode node){
+    public static void posY(TreeNode node,Pane drawPane){
         if(node.getPid()!=0){ //判断是否为根节点
             TreeNode p=NodeList.getParent(node); //获取父节点
             //第一个孩子
@@ -65,7 +66,7 @@ public class NodePos {
         }
         //对当前节点的子节点进行递归调用，计算他们在Y轴上的位置
         for (int i = 0; i < node.getNodeChildren().size(); i++) {
-            posY(node.getNodeChildren().get(i));
+            posY(node.getNodeChildren().get(i),drawPane);
         }
     }
 
