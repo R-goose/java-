@@ -38,7 +38,7 @@ public class DeriveGraph {
             node.setClick(false);
         }
         // 重新绘制树状图
-        DrawPane.redraw();
+        Controller.redraw();
 
         // 获取顶部节点
         getTop();

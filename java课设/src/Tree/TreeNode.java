@@ -26,9 +26,9 @@ public class TreeNode extends TreeData{
         this.pid=pid;
         //设置节点的样式
         this.setStyle(
-            "-fx-background-color:#FAEBD7;"	+
-            "-fx-background-radius:10;"+
-            "-fx-padding:10;"
+                "-fx-background-color:#FAEBD7;"	+
+                        "-fx-background-radius:10;"+
+                        "-fx-padding:10;"
         );
         //设置节点的最大尺寸
         this.setMaxSize(200, 80);
@@ -48,9 +48,9 @@ public class TreeNode extends TreeData{
     public TreeNode(){
         super();
         this.setStyle(
-             "-fx-background-color:#FAEBD7;"+
-             "-fx-background-radius:10;"+
-             "-fx-padding:10;"
+                "-fx-background-color:#FAEBD7;"+
+                        "-fx-background-radius:10;"+
+                        "-fx-padding:10;"
         );
         //设置节点的最大尺寸
         this.setMaxSize(200, 80);

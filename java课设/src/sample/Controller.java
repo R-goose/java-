@@ -1,43 +1,53 @@
 package sample;
 
 import Deque.*;
-//import DrawPane.DrawPane;
 import DrawPane.*;
+import Deque.NodeList;
+import DrawPane.CheckPane;
+import DrawPane.MyTreeView;
 import Tree.TreeNode;
-//import Tree.TreeUtil;
 import Tree.TreeUtil;
+import Tree.WriteTree;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
-import javafx.scene.Group;
-import javafx.scene.Scene;
+import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
-public class Controller {
 
+public class Controller {
     private static int id=1;
 
-    public static ScrollPane sp2=new ScrollPane();
     public static int fontsize = 20;
     public static Group g = new Group();
-
+    public static ScrollPane sp2 = new ScrollPane();
     public static TreeNode mouseNode = new TreeNode();
+    public static TreeNode rootNode = new TreeNode();
     public static int item = 1;
-
 
     @FXML
     private Button fillingColor;
@@ -57,8 +67,6 @@ public class Controller {
     @FXML
     private Button rightHide;
 
-    @FXML
-    private Button viewing;
 
     @FXML
     private Button left_layout;
@@ -66,8 +74,6 @@ public class Controller {
     @FXML
     private Button leftHide;
 
-    @FXML
-    private Button setting;
 
     @FXML
     private Button saving;
@@ -103,51 +109,217 @@ public class Controller {
     public ScrollPane sp;
 
     @FXML
-    void setting(ActionEvent event) {
-        System.out.println(666);
-    }
-
+    private Button fontSize;
 
     @FXML
-    void GetNewOne(ActionEvent event) {
+    private Text text;
 
+    @FXML
+    private Button fontColor;
+
+    private static Controller controller;
+    public SerializableNode serializableNode;
+    private File openedFile;//当前保存的思维导图目标文件，下次保存直接覆盖该文件
+
+    //记录鼠标按下时的坐标
+    private double offsetX;
+    private double offsetY;
+
+    public static Rectangle selectRect = new Rectangle();
+
+    @FXML
+    private Pane basePane;
+    static int num=0;
+    //按钮：新建页面
+    @FXML
+    void GetNewOne(ActionEvent event) throws Exception{
+        NodeList.list.clear();
+        CheckPane.controlPane(drawPane,sp);
+        deleteNode(rootNode);
+        draw();
+        GetNewOne.setDisable(true);
+//        controller.drawPane.getChildren().clear();
+        // 获取当前的 Stage
+        Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        currentStage.close();
+// 创建一个新的 Stage
+        Stage newStage = new Stage();
+// 加载新的FXML文件
+        Parent root = FXMLLoader.load(getClass().getResource("fxml/sample.fxml"));
+        Scene scene = new Scene(root, 1260, 840);
+// 修改新的 Stage 的属性
+        titleBarController.setStage(newStage);
+        newStage.setScene(scene);
+        newStage.show();
     }
 
-
+    //按钮：打开
     @FXML
     void openOne(ActionEvent event) {
+        openOne.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                Stage stage=new Stage();
+                FileChooser fc=new FileChooser();
+
+                fc.setTitle("打开文件");
+                fc.setInitialDirectory(new File(System.getProperty("user.home")));
+                fc.getExtensionFilters().addAll(
+                        //new FileChooser.ExtensionFilter("所有","*.*"),
+                        new FileChooser.ExtensionFilter("LinkMind", "*.LinkMind")
+                );
+                File file=fc.showOpenDialog(stage);
+                if(file==null) return;
+                System.out.println(file.getAbsolutePath());
+                ReadTree.read(file,Main.main_stage);
+
+                Controller.redraw();
+                CheckPane.controlPane(drawPane,sp);
+                Controller.SelectItem();
+                locateX(NodeList.getRoot());
+                locateY(NodeList.getRoot());
+
+                Controller.draw();
+
+
+                try {
+                    MyTreeView.setTreeView();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+    public void locateX(TreeNode node) {
+        //判断是否为根节点
+        if(node.getPid() != 0) {
+            TreeNode p = new TreeNode();
+            p = NodeList.getParent(node);
+            if(node.getPos()==1) {
+                node.setLeft(p.getLeft() + p.getWidth() + marginX);
+            }else{
+                node.setLeft(p.getLeft() - node.getWidth() - marginX);
+            }
+        }else {
+            node.setLeft(drawPane.getWidth()/2-node.getWidth()/2);
+        }
+        for(int i = 0;i < node.getNodeChildren().size();i++) {
+            locateX(node.getNodeChildren().get(i));
+        }
 
     }
 
-
-    @FXML
-    void viewing(ActionEvent event) {
-
+    public void locateY(TreeNode node) {
+        if(node.getPid() != 0) {
+            TreeNode p = NodeList.getParent(node);
+            //第一个孩子
+            if(NodeList.isFirstChild(node)) {
+                double pchildHeight = NodeList.getChildHeight(p,node.getPos());
+                double childHeight = NodeList.getChildHeight(node,node.getPos());
+                if(node.getNid() == p.getNodeChildren().get(p.getNodeChildren().size()-1).getNid()) {
+                    node.setTop(p.getTop() + p.getHeight()/2 - node.getHeight()/2);
+                }else {
+                    node.setTop(p.getTop() + p.getHeight()/2 - (pchildHeight - childHeight + node.getHeight())/2);
+                }
+            }else{//剩下的孩子
+                TreeNode preChild = NodeList.getPreChild(node);
+                double prechildHeight = NodeList.getChildHeight(preChild,node.getPos());
+                double childHeight = NodeList.getChildHeight(node,node.getPos());
+                node.setTop(preChild.getTop() + preChild.getHeight()/2 +(prechildHeight + childHeight - node.getHeight())/2 + marginY);
+            }
+        }else {//设置根节点的位置
+            node.setTop(drawPane.getHeight()/2-node.getHeight()/2);
+        }
+        for(int i = 0;i < node.getNodeChildren().size();i++) {
+            locateY(node.getNodeChildren().get(i));
+        }
     }
 
-
+    //按钮：查找
     @FXML
     void searching(ActionEvent event) {
 
     }
 
-
+    //按钮：保存
     @FXML
     void saving(ActionEvent event) {
-
+        saving.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                if(NodeList.list.isEmpty()) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("注意");
+                    alert.setHeaderText(null);
+                    alert.setContentText("你还没有绘制思维导图");
+                    alert.show( );
+                    return;
+                }
+                for(int i = 0;i<NodeList.list.size();i++) {
+                    TreeNode node = new TreeNode();
+                    node = NodeList.list.get(i);
+                    node.setClick(false);
+                }
+                Stage stage=new Stage();
+                FileChooser fc=new FileChooser();
+                fc.setTitle("保存文件");
+                fc.setInitialFileName("思维导图");
+                text.setText(SetTitle.showTitle());
+                fc.setInitialDirectory(new File(System.getProperty("user.home")));
+                fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("LinkMind","*.LinkMind"));
+                File file=fc.showSaveDialog(stage);
+                if(file==null) return;
+                System.out.println(file.getAbsolutePath());
+                WriteTree.write(file,text);
+                stage.setTitle("思维导图");
+            }
+        });
     }
 
 
+//按钮：导出
     @FXML
     void deriving(ActionEvent event) {
-
+        deriving.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                if(NodeList.list.isEmpty()) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("注意");
+                    alert.setHeaderText(null);
+                    alert.setContentText("当前思维导图画板为空！");
+                    alert.show( );
+                    return;
+                }
+                Stage stage=new Stage();
+                FileChooser fc=new FileChooser();
+                fc.setTitle("保存为png图片或jpg图片");
+                fc.setInitialFileName("思维导图");
+                fc.setInitialDirectory(new File(System.getProperty("user.home")));
+                fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("PNG","*.png"));
+                fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JPG","*.jpg"));
+                File file=fc.showSaveDialog(stage);
+                if(file==null) return;
+                try {
+                    DeriveGraph.deriveGraph(file,drawPane);
+                }catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        System.out.println(NodeList.list);
     }
 
+    //按钮：新增节点
     @FXML
     void newNode(ActionEvent event) {
         if (NodeList.list.isEmpty()) {
-            TreeUtil.creatRoot(drawPane,sp);
-
+            rootNode = TreeUtil.creatRoot(drawPane,sp);
             draw();
             try {
                 setTreeView(ap);
@@ -159,7 +331,6 @@ public class Controller {
             brother.setDisable(false);
         }
     }
-
 
     @FXML
     void deleteNode(ActionEvent event) {
@@ -186,18 +357,15 @@ public class Controller {
         draw();
     }
 
-
     @FXML
     void left_layout(ActionEvent event) {
         item = 2;
         SelectItem();
-
         posX(NodeList.getRoot());
         posY(NodeList.getRoot());
         CheckPane.controlPane(drawPane,sp);
         draw();
     }
-
 
     @FXML
     void right_layout(ActionEvent event) {
@@ -209,38 +377,23 @@ public class Controller {
         draw();
     }
 
-
     @FXML
     void center_layout(ActionEvent event) {
         item = 1;
         SelectItem();
-//        CheckPane.controlPane();
+        CheckPane.controlPane(drawPane,sp);
         posX(NodeList.getRoot());
         posY(NodeList.getRoot());
         draw();
     }
 
-
-    @FXML
-    void borderRadious(ActionEvent event) {
-
-    }
-
-
-    @FXML
-    void fillingColor(ActionEvent event) {
-
-    }
-
-
-    //增加子节点
     @FXML
     void son(ActionEvent event) {
         System.out.println("增加子节点");
         TreeNode node=mouseNode;
         System.out.println(node.getNid());
         System.out.println(node.getPid());
-        TreeUtil.addNode(node);
+        addNode(node);
         SelectItem();
         CheckPane.controlPane(drawPane,sp);
         posX(NodeList.getRoot());
@@ -251,8 +404,8 @@ public class Controller {
             e1.printStackTrace();
         }
         draw();
-    }
 
+    }
 
     //增加同级节点
     @FXML
@@ -273,22 +426,28 @@ public class Controller {
         draw();
     }
 
-
     @FXML
-    void leftHide(ActionEvent event) {
+    void borderRadious(ActionEvent event) {
 
     }
 
 
     @FXML
-    void rightHide(ActionEvent event) {
+    void fillingColor(ActionEvent event) {
 
     }
 
 
-    /**
-     * 初始化成员变量
-     */
+    @FXML
+    void fontSize(ActionEvent event) {
+
+    }
+
+
+    @FXML
+    void fontColor(ActionEvent event) {
+
+    }
 
     public void initialize() {
 //        draw();
@@ -308,18 +467,11 @@ public class Controller {
         }
     }
 
-
-    /**
-     * 绘制节点的方法
-     */
-    //绘图方法
-    //在绘制面板上绘制结点和连线，处理结点的样式和布局
     public static void draw() {
         //清空群组中的所有子节点
         g.getChildren().clear();
         //将节点列表中的节点插入双端队列中
         Deque.insert(NodeList.list);
-
         for (int i = 0; i < NodeList.list.size(); i++) {
             TreeNode node = NodeList.list.get(i);   //获取节点
             node.setTxt(node.getTxt());           //设置节点文本
@@ -358,16 +510,6 @@ public class Controller {
                 line(node);
             }
 
-            //如果节点有图片路径，则添加图片到节点
-            if (node.getImagPath() != null) {
-                ImageView imageView = new ImageView(node.getImagPath());   //创建ImageView对象
-                Label label = node;                                        //将节点转换为Label对象
-                imageView.setFitWidth(100);  // 设置图片宽度
-                imageView.setFitHeight(100);  // 设置图片高度
-                label.setGraphic(imageView);  // 将图片添加到节点的图形属性中
-                label.setContentDisplay(ContentDisplay.BOTTOM);  // 设置图片在节点下方显示
-                label.setTextAlignment(TextAlignment.CENTER);  // 设置文本居中对齐
-            }
         }
     }
 
@@ -429,11 +571,9 @@ public class Controller {
         g.getChildren().addAll(line1, line2, line3);
     }
 
-    //重新绘制整个图形界面
     public static void redraw() {
         //清空绘图面板中的所有节点和连线
         g.getChildren().clear();
-
         //遍历节点列表
         for (int i = 0; i < NodeList.list.size(); i++) {
             //获取当前节点
@@ -483,15 +623,10 @@ public class Controller {
         }
     }
 
-    /**
-     * 用于计算节点所在的位置
-     */
-
     public static int marginX = 50;   //表示节点在X轴上的边距
     public static int marginY = 20;   //表示节点在Y轴上的边距
 
     //用于计算节点在X轴上的位置
-
     public void posX(TreeNode node) {
         //判断是否为根节点，如果不是根节点
         //则获取其父节点并根据节点在父节点中的位置确认当前节点在X轴上的位置
@@ -548,14 +683,6 @@ public class Controller {
         }
     }
 
-//    class MouseClick {
-//        public static TreeNode node = new TreeNode();
-//        //鼠标双击事件：监听节点，双击出现文本输入框，编辑节点文字内容
-
-    /**
-     * 鼠标双击出现文本框
-     * 并进行相应的编辑
-     */
     public void doubleClick() {
         drawPane.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
@@ -563,213 +690,215 @@ public class Controller {
                 if (event.getClickCount() == 2) {
                     double x = event.getSceneX();
                     double y = event.getSceneY();
-//				     System.out.println(x+","+y);
                     for (int i = 0; i < NodeList.list.size(); i++) {
                         TreeNode node = new TreeNode();
                         node = NodeList.list.get(i);
                         Bounds b = node.getLayoutBounds();
                         Bounds bd = node.localToScene(b);
-                        //	node.setClick(false);
-//							System.out.println(node.getLeft()+","+node.getWidth());
-//							System.out.println(node.getTop()+","+node.getHeight());
-                        if (bd.getMinX() <= x && bd.getMaxX() >= x && bd.getMinY() <= y && bd.getMaxY() >= y
-//									node.getLeft()<= x&& node.getLeft()+node.getWidth()>=x
-//							     &&node.getTop()<=y && node.getTop()+node.getHeight()>=y
-                        ) {
-                            //	node.setClick(true);
+                        if (bd.getMinX() <= x && bd.getMaxX() >= x && bd.getMinY() <= y && bd.getMaxY() >= y) {
                             showTextArea(node);
                         }
-                        //	MyDrawPane.draw(); 另起方法画框
                     }
                 }
             }
         });
     }
 
-
-
-        //单击事件：监控节点和按钮，进行相应操作
-        public  void Click() {
-            drawPane.setOnMouseClicked(event -> {
-                if(!NodeList.list.isEmpty()) {
-                    newNode.setDisable(true);
-                    son.setDisable(true);
-                    brother.setDisable(true);
-                    deleteNode.setDisable(true);
-//                    MyButtonBar.b4.setDisable(true);
-//                    MyButtonBar.b6.setDisable(true);
-//                    MyButtonBar.b7.setDisable(true);
-                }
-
-//			System.out.println("isclick");
-//			 double x1 = event.getX()
-//		     double y1 = event.getY();
-                double x = event.getSceneX();
-                double y = event.getSceneY();
+    //单击事件：监控节点和按钮，进行相应操作
+    public  void Click() {
+        drawPane.setOnMouseClicked(event -> {
+            if(!NodeList.list.isEmpty()) {
+                newNode.setDisable(true);
+                son.setDisable(true);
+                brother.setDisable(true);
+                deleteNode.setDisable(true);
+            }
+            double x = event.getSceneX();
+            double y = event.getSceneY();
 
 //		    System.out.printf("%f,%f:\n",x1,y1);
-                for (int i = 0; i < NodeList.list.size(); i++) {
-                    TreeNode n = new TreeNode();
-                    n = NodeList.list.get(i);
-                    n.setClick(false);
-                    Bounds b = n.getLayoutBounds();
-                    Bounds bd = n.localToScene(b);
+            for (int i = 0; i < NodeList.list.size(); i++) {
+                TreeNode n = new TreeNode();
+                n = NodeList.list.get(i);
+                n.setClick(false);
+                Bounds b = n.getLayoutBounds();
+                Bounds bd = n.localToScene(b);
+                n.setStyle(
+                        "-fx-background-color:#d6ecf0;" +
+                                "-fx-background-radius:10;" +
+                                "-fx-padding:10;"
+                );
+                //System.out.printf("%f,%f:\n",bd.getWidth(),bd.getHeight());
+//					System.out.printf("%f,%f:\n",bd.getMinX(),bd.getMaxX());
+                if (
+                        bd.getMinX() <= x && bd.getMaxX() >= x && bd.getMinY() <= y && bd.getMaxY() >= y
+//							n.getLeft()<= x&& n.getLeft()+n.getWidth()>=x
+//					     &&n.getTop()<=y && n.getTop()+n.getHeight()>=y
+                ) {
+                    n.setClick(true);
+                    mouseNode= n;
                     n.setStyle(
-                            "-fx-background-color:#d6ecf0;" +
+                            "-fx-background-color:#faff72;" +
                                     "-fx-background-radius:10;" +
                                     "-fx-padding:10;"
                     );
-                    //System.out.printf("%f,%f:\n",bd.getWidth(),bd.getHeight());
-//					System.out.printf("%f,%f:\n",bd.getMinX(),bd.getMaxX());
-                    if (
-                            bd.getMinX() <= x && bd.getMaxX() >= x && bd.getMinY() <= y && bd.getMaxY() >= y
-//							n.getLeft()<= x&& n.getLeft()+n.getWidth()>=x
-//					     &&n.getTop()<=y && n.getTop()+n.getHeight()>=y
-                    ) {
-                        n.setClick(true);
-                        mouseNode= n;
-                        n.setStyle(
-                                "-fx-background-color:#faff72;" +
-                                        "-fx-background-radius:10;" +
-                                        "-fx-padding:10;"
-                        );
 //                        if(node.getImgPath()!=null) {
 //                            MyButtonBar.b7.setDisable(false);
 //                            MyButtonBar.b6.setDisable(true);
 //                        }
-                        newNode.setDisable(true);
-                        son.setDisable(false);
-                        deleteNode.setDisable(false);
+                    newNode.setDisable(true);
+                    son.setDisable(false);
+                    deleteNode.setDisable(false);
 //                        MyButtonBar.b5.setDisable(false);
 //                        MyButtonBar.b6.setDisable(false);
-                       if(mouseNode != NodeList.getRoot()) {
-                           brother.setDisable(false);
-                       }else
-                       {
-                           brother.setDisable(true);
-                       }
-                       if(!NodeList.list.isEmpty()){
-                           newNode.setDisable(true);
-                       }else{
-                           newNode.setDisable(false);
-                       }
-//                        else MyButtonBar.b3.setDisable(true);
+                    if(mouseNode != NodeList.getRoot()) {
+                        brother.setDisable(false);
+                    }else
+                    {
+                        brother.setDisable(true);
                     }
+                    if(!NodeList.list.isEmpty()){
+                        newNode.setDisable(true);
+                    }else{
+                        newNode.setDisable(false);
+                    }
+//                        else MyButtonBar.b3.setDisable(true);
                 }
-                // MyDrawPane.draw();  //另起方法画框
-            });
+            }
+            // MyDrawPane.draw();  //另起方法画框
+        });
 
     }
-        //鼠标双击事件：监听节点，双击出现文本输入框，编辑节点文字内容
 
+    /**
+     * 显示文本框输入口的输入方法
+     *
+     * @param node
+     */
+    public void showTextArea(TreeNode node) {
+        // 创建一个AnchorPane作为窗口的根节点
+        AnchorPane an = new AnchorPane();
+        // 创建一个新的舞台
+        Stage stage = new Stage();
 
-// 显示带有文本框的窗口，编辑节点相关内容，重新绘制相关视图
+        // 创建文本输入框，并设置其初始文本内容、字体大小和大小
+        TextArea ta = new TextArea();
+        ta.appendText(node.getText());
+        ta.setFont(Font.font(16));
+        ta.setPrefWidth(250);
+        ta.setPrefHeight(150);
+        ta.setWrapText(true);
 
-        // 显示文本输入框窗口方法
+        // 创建确定按钮，并设置其位置和大小
+        Button btn = new Button("确定");
+        btn.setLayoutX(0);
+        btn.setLayoutY(150);
+        btn.setPrefWidth(250);
+        btn.setPrefHeight(35);
 
-        /**
-         * 显示文本框输入口的输入方法
-         *
-         * @param node
-         */
-        public void showTextArea(TreeNode node) {
-            // 创建一个AnchorPane作为窗口的根节点
-            AnchorPane an = new AnchorPane();
-            // 创建一个新的舞台
-            Stage stage = new Stage();
+        // 将文本输入框和按钮添加到AnchorPane中
+        an.getChildren().addAll(ta, btn);
 
-            // 创建文本输入框，并设置其初始文本内容、字体大小和大小
-            TextArea ta = new TextArea();
-            ta.appendText(node.getText());
-            ta.setFont(Font.font(16));
-            ta.setPrefWidth(250);
-            ta.setPrefHeight(150);
-            ta.setWrapText(true);
+        // 按钮点击事件处理
+        btn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                // 获取文本输入框中的内容
+                String str = ta.getText();
+                // 判断内容是否发生改变
+                if (!str.equals(node.getText())) {
+                    // 更新节点的文本内容和文本属性
+                    node.setText(str);
+                    node.setTxt(str);
 
-            // 创建确定按钮，并设置其位置和大小
-            Button btn = new Button("确定");
-            btn.setLayoutX(0);
-            btn.setLayoutY(150);
-            btn.setPrefWidth(250);
-            btn.setPrefHeight(35);
+                    // 重新应用CSS样式、布局和绘制相关视图
+                    Controller.g.applyCss();
+                    Controller.g.layout();
+                    CheckPane.controlPane(drawPane,sp);
+                    posX(NodeList.getRoot());
+                    posY(NodeList.getRoot());
+                    Controller.draw();
 
-            // 将文本输入框和按钮添加到AnchorPane中
-            an.getChildren().addAll(ta, btn);
-
-            // 按钮点击事件处理
-            btn.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    // 获取文本输入框中的内容
-                    String str = ta.getText();
-                    // 判断内容是否发生改变
-                    if (!str.equals(node.getText())) {
-                        // 更新节点的文本内容和文本属性
-                        node.setText(str);
-                        node.setTxt(str);
-
-                        // 重新应用CSS样式、布局和绘制相关视图
-                        Controller.g.applyCss();
-                        Controller.g.layout();
-                        CheckPane.controlPane(drawPane,sp);
-                        posX(NodeList.getRoot());
-                        posY(NodeList.getRoot());
-                        Controller.draw();
-
-                        // 更新TreeView
-                        try {
-                            MyTreeView.setTreeView();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                    // 更新TreeView
+                    try {
+                        MyTreeView.setTreeView();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    // 关闭窗口
-                    stage.close();
                 }
-            });
+                // 关闭窗口
+                stage.close();
+            }
+        });
 
-            // 创建场景，并将AnchorPane设置为根节点
-            Scene scene = new Scene(an);
-            // 将场景设置到舞台上
-            stage.setScene(scene);
-            // 设置舞台标题和大小
-            stage.setTitle("文本输入框");
-            stage.setWidth(265);
-            stage.setHeight(225);
-            // 显示舞台
-            stage.show();
-        }
+        // 创建场景，并将AnchorPane设置为根节点
+        Scene scene = new Scene(an);
+        // 将场景设置到舞台上
+        stage.setScene(scene);
+        // 设置舞台标题和大小
+        stage.setTitle("文本输入框");
+        stage.setWidth(265);
+        stage.setHeight(225);
+        // 显示舞台
+        stage.show();
+    }
 
 
-        /**
-         * 管理节点的工具类
-         */
+    /**
+     * 管理节点的工具类
+     */
 
-        public void creatRoot() {
-            //创建根节点对象，并设置唯一标识和标题
-            TreeNode node = new TreeNode(0, "双击输入");
-            //设置节点的唯一标识id并自增
-            node.setNid(id++);
-            System.out.println("createNode");
-            System.out.println(id);
-            //将根节点添加到绘图面板中，以便显示在页面上
-            Controller.g.getChildren().add(node);
-            //应用CSS样式到该对象及其子节点
-            Controller.g.applyCss();
-            //重新计算和布局对象及其子节点的位置和大小
-            Controller.g.layout();
+    public void creatRoot() {
+        //创建根节点对象，并设置唯一标识和标题
+        TreeNode node = new TreeNode(0, "双击输入");
+        //设置节点的唯一标识id并自增
+        node.setNid(id++);
+        System.out.println("createNode");
+        System.out.println(id);
+        //将根节点添加到绘图面板中，以便显示在页面上
+        Controller.g.getChildren().add(node);
+        //应用CSS样式到该对象及其子节点
+        Controller.g.applyCss();
+        //重新计算和布局对象及其子节点的位置和大小
+        Controller.g.layout();
 
-            //将根节点添加到节点列表中，永固管理所有节点
-            NodeList.list.add(node);
-            //控制面板更新，以便在界面上反映节点的变化
-            //CheckPane.controlPane();
-            node.setLeft(drawPane.getWidth() / 2 - node.getWidth() / 2);
-            node.setTop(drawPane.getHeight() / 2 - node.getHeight() / 2);
-        }
+        //将根节点添加到节点列表中，永固管理所有节点
+        NodeList.list.add(node);
+        //控制面板更新，以便在界面上反映节点的变化
+        //CheckPane.controlPane();
+        node.setLeft(drawPane.getWidth() / 2 - node.getWidth() / 2);
+        node.setTop(drawPane.getHeight() / 2 - node.getHeight() / 2);
+    }
+
+    @FXML
+    void leftHide(ActionEvent event) {
+        leftHide.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, new EventHandler<javafx.scene.input.MouseEvent>() {
+            @Override
+            public void handle(javafx.scene.input.MouseEvent mouseEvent) {
+                URL url = getClass().getResource("fxml/hiding_left.fxml");
+                Parent root=null;
+                try {
+                    root = FXMLLoader.load(url);
+                }catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // 获取当前舞台
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+                // 将新的页面加载到当前舞台的场景中
+                Scene scene = new Scene(root,1260, 840);
+                stage.setScene(scene);
+                stage.show();
+
+            }
+        });
+    }
 
     public static void addNode(TreeNode p) {
         TreeNode node = new TreeNode(p.getNid(),"分支主题");
-        node.setNid(id++);
+        node.setNid(id);
+        id++;
         NodeList.list.add(node);
         p.getNodeChildren().add(node);
         g.getChildren().add(node);
@@ -812,41 +941,39 @@ public class Controller {
             //System.out.println("孩子不空");
         }
     }
-
-
-/**
- * 关于布局
- * 居中，左，右布局
- */
-public static void SelectItem() {
-    if(item==1) {
-        for(int i = 0; i<NodeList.list.size();i++) {
-            TreeNode node = new TreeNode();
-            node = NodeList.list.get(i);
-            //System.out.println("ChildHeight:"+NodeList.getChildHeight(node, node.getPos()));
-            if(NodeList.getParent(node)==NodeList.getRoot()) {
-                Balance();
+    /**
+     * 关于布局
+     * 居中，左，右布局
+     */
+    public static void SelectItem() {
+        if(item==1) {
+            for(int i = 0; i<NodeList.list.size();i++) {
+                TreeNode node = new TreeNode();
+                node = NodeList.list.get(i);
+                //System.out.println("ChildHeight:"+NodeList.getChildHeight(node, node.getPos()));
+                if(NodeList.getParent(node)==NodeList.getRoot()) {
+                    Balance();
+                }
+                else {
+                    node.setPos(NodeList.getParent(node).getPos());
+                }
             }
-            else {
-                node.setPos(NodeList.getParent(node).getPos());
+        }
+        if(item==2) {
+            for(int i = 0; i<NodeList.list.size();i++) {
+                TreeNode node = new TreeNode();
+                node = NodeList.list.get(i);
+                node.setPos(0);
+            }
+        }
+        if(item==3) {
+            for(int i = 0; i<NodeList.list.size();i++) {
+                TreeNode node = new TreeNode();
+                node = NodeList.list.get(i);
+                node.setPos(1);
             }
         }
     }
-    if(item==2) {
-        for(int i = 0; i<NodeList.list.size();i++) {
-            TreeNode node = new TreeNode();
-            node = NodeList.list.get(i);
-            node.setPos(0);
-        }
-    }
-    if(item==3) {
-        for(int i = 0; i<NodeList.list.size();i++) {
-            TreeNode node = new TreeNode();
-            node = NodeList.list.get(i);
-            node.setPos(1);
-        }
-    }
-}
 
     //节点平衡逻辑
     public static void Balance() {
@@ -874,6 +1001,38 @@ public static void SelectItem() {
                 else node.get(i).setPos(1);
             }
         }
+    }
+
+    @FXML
+    void rightHide(ActionEvent event) {
+        rightHide.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, new EventHandler<javafx.scene.input.MouseEvent>() {
+            @Override
+            public void handle(javafx.scene.input.MouseEvent mouseEvent) {
+                URL url = getClass().getResource("fxml/hiding_right.fxml");
+                Parent root=null;
+                try {
+                    root = FXMLLoader.load(url);
+                }catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // 获取当前舞台
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+                // 将新的页面加载到当前舞台的场景中
+                Scene scene = new Scene(root,1260, 840);
+                stage.setScene(scene);
+                stage.show();
+
+            }
+        });
+    }
+
+    public static Controller getInstance(Pane drawPane){
+        if (drawPane==null) {
+            return null;
+        }
+        return controller;
     }
 
     public static void setTreeView(AnchorPane ap) throws IOException {
@@ -936,8 +1095,4 @@ public static void SelectItem() {
             walk(child, childnode); // 递归构建树形视图
         }
     }
-
-
-
-
 }

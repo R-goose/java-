@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="840.0" prefWidth="1260.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.HidingLeft">
+   <children>
+      <Pane layoutY="48.0" prefHeight="42.0" prefWidth="1260.0" style="-fx-background-color: #F9F9F9;">
+         <children>
+            <Text layoutX="611.0" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-text-alignment: center;" text="name" wrappingWidth="37.4267578125">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Text>
+         </children>
+         <effect>
+            <DropShadow color="#aba9a9" height="29.19" offsetX="1.0" offsetY="2.0" radius="11.245000000000001" spread="0.03" width="17.79" />
+         </effect>
+      </Pane>
+      <Pane layoutY="105.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="57.0" style="-fx-background-color: #F9F9F9; -fx-background-radius: 0 24 24 0;" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="1203.0" AnchorPane.topAnchor="105.0">
+         <children>
+            <ImageView fitHeight="38.0" fitWidth="37.0" layoutX="10.0" layoutY="354.0" rotate="180.0">
+               <image>
+                  <Image url="@arrowleft.png" />
+               </image>
+            </ImageView>
+            <Button fx:id="leftShow" layoutX="10.0" layoutY="360.0" onAction="#leftShow" opacity="0.0" prefHeight="38.0" prefWidth="37.0" rotate="180.0">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+         </children>
+         <effect>
+            <DropShadow color="#8a8787" height="12.1" radius="12.965" width="41.76" />
+         </effect>
+      </Pane>
+      <Pane layoutX="66.0" layoutY="105.0" prefHeight="720.0" prefWidth="954.0" style="-fx-background-color: #ffffff;">
+         <effect>
+            <DropShadow blurType="TWO_PASS_BOX" color="#aeaeae" height="38.05" radius="20.935" spread="0.35" width="47.69" />
+         </effect>
+      </Pane>
+      <Pane layoutX="1030.0" layoutY="105.0" prefHeight="720.0" prefWidth="230.0" style="-fx-background-color: #F9F9F9; -fx-background-radius: 24 0 0 24;">
+         <children>
+            <Pane layoutX="15.0" layoutY="35.0" prefHeight="673.0" prefWidth="200.0" />
+            <ImageView fitHeight="38.0" fitWidth="37.0" layoutX="14.0" layoutY="360.0" rotate="180.0">
+               <image>
+                  <Image url="@arrowleft.png" />
+               </image>
+            </ImageView>
+            <Button fx:id="allHide" layoutX="8.0" layoutY="364.0" onAction="#allHide" opacity="0.0" prefHeight="38.0" prefWidth="37.0">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Text layoutX="85.0" layoutY="26.0" strokeMiterLimit="14.0" strokeType="OUTSIDE" strokeWidth="0.0" text="树状结构区">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Text>
+         </children>
+         <effect>
+            <DropShadow color="#b2b0b0" height="10.62" radius="5.922499999999999" spread="0.51" width="15.07" />
+         </effect>
+      </Pane>
+      <Pane prefHeight="48.0" prefWidth="1260.0" style="-fx-background-color: #10565E;">
+         <children>
+            <Button fx:id="GetNewOne" alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="5.0" lineSpacing="1.0" mnemonicParsing="false" onAction="#GetNewOne" prefHeight="38.0" prefWidth="86.0" style="-fx-background-color: #ffffff; -fx-background-radius: 50;" text="新建" textAlignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+               <effect>
+                  <DropShadow blurType="GAUSSIAN" color="#727272" height="3.3" radius="0.8674999999999999" spread="1.0" width="2.17" />
+               </effect>
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets bottom="6.0" right="2.0" />
+               </opaqueInsets>
+            </Button>
+            <Button fx:id="openOne" alignment="CENTER" contentDisplay="CENTER" layoutX="116.0" layoutY="5.0" lineSpacing="1.0" mnemonicParsing="false" onAction="#openOne" prefHeight="38.0" prefWidth="86.0" style="-fx-background-color: #ffffff; -fx-background-radius: 50;" text="打开" textAlignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+               <effect>
+                  <DropShadow blurType="GAUSSIAN" color="#727272" height="3.3" radius="0.8674999999999999" spread="1.0" width="2.17" />
+               </effect>
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets bottom="6.0" right="2.0" />
+               </opaqueInsets>
+            </Button>
+            <Button fx:id="searching" alignment="CENTER" contentDisplay="CENTER" layoutX="218.0" layoutY="5.0" lineSpacing="1.0" mnemonicParsing="false" onAction="#searching" prefHeight="38.0" prefWidth="86.0" style="-fx-background-color: #ffffff; -fx-background-radius: 50;" text="查找" textAlignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+               <effect>
+                  <DropShadow blurType="GAUSSIAN" color="#727272" height="3.3" radius="0.8674999999999999" spread="1.0" width="2.17" />
+               </effect>
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets bottom="6.0" right="2.0" />
+               </opaqueInsets>
+            </Button>
+            <Button fx:id="saving" alignment="CENTER" contentDisplay="CENTER" layoutX="318.0" layoutY="5.0" lineSpacing="1.0" mnemonicParsing="false" onAction="#saving" prefHeight="38.0" prefWidth="86.0" style="-fx-background-color: #ffffff; -fx-background-radius: 50;" text="保存" textAlignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+               <effect>
+                  <DropShadow blurType="GAUSSIAN" color="#727272" height="3.3" radius="0.8674999999999999" spread="1.0" width="2.17" />
+               </effect>
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets bottom="6.0" right="2.0" />
+               </opaqueInsets>
+            </Button>
+            <Button fx:id="deriving" alignment="CENTER" contentDisplay="CENTER" layoutX="420.0" layoutY="5.0" lineSpacing="1.0" mnemonicParsing="false" onAction="#deriving" prefHeight="38.0" prefWidth="86.0" style="-fx-background-color: #ffffff; -fx-background-radius: 50;" text="导出" textAlignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+               <effect>
+                  <DropShadow blurType="GAUSSIAN" color="#727272" height="3.3" radius="0.8674999999999999" spread="1.0" width="2.17" />
+               </effect>
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets bottom="6.0" right="2.0" />
+               </opaqueInsets>
+            </Button>
+         </children>
+      </Pane>
+   </children>
+</AnchorPane>

@@ -2,6 +2,7 @@ package Tree;
 
 import Deque.*;
 import DrawPane.*;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import DrawPane.*;
@@ -17,7 +18,7 @@ public class TreeUtil {
     private static int id=1;
 
     //创建根节点的方法
-    public static void creatRoot(Pane drawPane, ScrollPane sp){
+    public static TreeNode creatRoot(Pane drawPane, ScrollPane sp){
         //创建根节点对象，并设置唯一标识和标题
         TreeNode node = new TreeNode(0,"双击输入");
         //设置节点的唯一标识id并自增
@@ -35,6 +36,7 @@ public class TreeUtil {
         CheckPane.controlPane(drawPane,sp);
         node.setLeft(drawPane.getWidth() / 2 - node.getWidth() / 2);
         node.setTop(drawPane.getHeight() / 2 - node.getHeight() / 2);
+        return node;
     }
     public static void addNode(TreeNode p) {
         TreeNode node = new TreeNode(p.getNid(),"分支主题");

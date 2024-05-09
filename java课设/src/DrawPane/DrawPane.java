@@ -50,9 +50,9 @@ public class DrawPane extends ScrollPane {
 
             //设置节点样式
             node.setStyle(
-                     "-fx-background-color:#d6ecf0;"+
-                     "-fx-background-radius:10;"+
-                     "-fx-padding:10;"
+                    "-fx-background-color:#d6ecf0;"+
+                            "-fx-background-radius:10;"+
+                            "-fx-padding:10;"
             );
             node.setMaxSize(200, 80);
             node.setWrapText(true);
@@ -65,8 +65,8 @@ public class DrawPane extends ScrollPane {
             if(node.isClick()) {
                 node.setStyle(
                         "-fx-background-color:#faff72;"	+
-                        "-fx-background-radius:10;"+
-                        "-fx-padding:10;"
+                                "-fx-background-radius:10;"+
+                                "-fx-padding:10;"
                 );
             }
 
@@ -92,7 +92,7 @@ public class DrawPane extends ScrollPane {
                 label.setContentDisplay(ContentDisplay.BOTTOM);  // 设置图片在节点下方显示
                 label.setTextAlignment(TextAlignment.CENTER);  // 设置文本居中对齐
             }
-       }
+        }
     }
 
     public static void line(TreeNode node) {
