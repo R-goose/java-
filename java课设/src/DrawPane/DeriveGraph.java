@@ -1,5 +1,6 @@
 package DrawPane;
 
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import Tree.*;
@@ -10,13 +11,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import sample.Controller;
+import sample.*;
 
 /**
  * 从树状图中导出图形
  * 并保存为图片
  */
+
 
 public class DeriveGraph {
     // 定义填充量
@@ -30,7 +31,7 @@ public class DeriveGraph {
     private static TreeNode bottom = new TreeNode();
 
     // 计算出图形的起始点坐标以及图形的宽度和高度
-    public static void deriveGraph(File file, Pane drawPane) throws Exception {
+    public static void deriveGraph(File file,Pane drawPane) throws Exception {
         // 重置节点的点击状态
         for (int i = 0; i < NodeList.list.size(); i++) {
             TreeNode node = NodeList.list.get(i);
@@ -57,52 +58,6 @@ public class DeriveGraph {
 
         // 将截取的图形转换为BufferedImage并保存为png文件
         BufferedImage bi = SwingFXUtils.fromFXImage(wi2, null);
-
-        // 将节点的颜色信息应用到相应的图形元素上
-        for (TreeNode node : NodeList.list) {
-            // 获取节点的坐标和尺寸
-            double nodeX = node.getLeft() - x;
-            double nodeY = node.getTop() - y;
-            double nodeWidth = node.getWidth();
-            double nodeHeight = node.getHeight();
-            // 获取节点的颜色
-            String color01 = node.getNewColor();
-
-// 检查颜色字符串是否为有效的十六进制格式
-            if (color01.matches("[0-9a-fA-F]+")) {
-                // 提取红色、绿色和蓝色分量的字符串
-                String redHex = color01.substring(23, 25);
-                String greenHex = color01.substring(25, 27);
-                String blueHex = color01.substring(27, 29);
-                System.out.println(redHex);
-                System.out.println(greenHex);
-                System.out.println(blueHex);
-                try {
-                    // 将十六进制字符串转换为对应的整数值
-                    int red = Integer.parseInt(redHex, 16);
-                    int green = Integer.parseInt(greenHex, 16);
-                    int blue = Integer.parseInt(blueHex, 16);
-
-                    // 在BufferedImage上绘制节点的颜色
-                    for (int i = (int) nodeX; i < nodeX + nodeWidth; i++) {
-                        for (int j = (int) nodeY; j < nodeY + nodeHeight; j++) {
-                            int rgb = (red << 16) | (green << 8) | blue;
-                            bi.setRGB(i, j, rgb);
-                        }
-                    }
-                } catch (NumberFormatException e) {
-                    // 如果转换失败，则输出错误信息或采取其他适当的处理方式
-                    e.printStackTrace();
-                }
-            } else {
-                // 如果颜色字符串不是有效的十六进制格式，则输出错误信息或采取其他适当的处理方式
-                System.out.println("Invalid color format: " + color01);
-            }
-
-
-
-        }
-
         ImageIO.write(bi, "png", file);
     }
 
