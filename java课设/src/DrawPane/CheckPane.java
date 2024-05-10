@@ -2,7 +2,7 @@ package DrawPane;
 
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
-import sample.*;
+
 public class CheckPane {
 
     public static double width = 0;
@@ -15,11 +15,8 @@ public class CheckPane {
         double height = 1000+DeriveGraph.getMaxHeight();
         drawPane.setPrefWidth(width);
         drawPane.setPrefHeight(height);
-
-
-//        Main.pane.applyCss();
-//        Main.pane.layout();
-//        //设置滚轮为中间值
+        System.out.println(width);
+        System.out.println(height);
         sp.setVvalue(0.5);
         sp.setHvalue(0.5);
 

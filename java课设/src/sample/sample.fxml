@@ -325,13 +325,9 @@
          </children>
       </Pane>
       <ScrollPane fx:id="sp" layoutX="260.0" layoutY="105.0" prefHeight="720.0" prefWidth="763.0">
-        <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="715.0" prefWidth="761.0">
-               <children>
-                  <Pane fx:id="drawPane" prefHeight="703.0" prefWidth="751.0" />
-               </children>
-            </AnchorPane>
-        </content>
+         <content>
+            <Pane fx:id="drawPane" prefHeight="709.0" prefWidth="754.0" />
+         </content>
       </ScrollPane>
    </children>
 </AnchorPane>

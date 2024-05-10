@@ -2,23 +2,23 @@ package sample;
 
 import Deque.*;
 import DrawPane.*;
-import Deque.NodeList;
-import DrawPane.CheckPane;
-import DrawPane.MyTreeView;
-import Tree.TreeNode;
-import Tree.TreeUtil;
-import Tree.WriteTree;
+import Deque.NodeList;;
+import DrawPane.*;
+import Tree.*;
+
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -40,11 +40,8 @@ import java.util.List;
 
 
 public class Controller {
-    private static int id=1;
 
-    public static int fontsize = 20;
     public static Group g = new Group();
-    public static ScrollPane sp2 = new ScrollPane();
     public static TreeNode mouseNode = new TreeNode();
     public static TreeNode rootNode = new TreeNode();
     public static int item = 1;
@@ -53,7 +50,7 @@ public class Controller {
     private Button fillingColor;
 
     @FXML
-    private Button searching;
+    private Button undo;
 
     @FXML
     private Button deleteNode;
@@ -135,19 +132,18 @@ public class Controller {
     void GetNewOne(ActionEvent event) throws Exception{
         NodeList.list.clear();
         CheckPane.controlPane(drawPane,sp);
-        deleteNode(rootNode);
+        TreeUtil.deleteNode(rootNode);
         draw();
         GetNewOne.setDisable(true);
-//        controller.drawPane.getChildren().clear();
         // 获取当前的 Stage
         Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         currentStage.close();
-// 创建一个新的 Stage
+        // 创建一个新的 Stage
         Stage newStage = new Stage();
-// 加载新的FXML文件
+        // 加载新的FXML文件
         Parent root = FXMLLoader.load(getClass().getResource("fxml/sample.fxml"));
         Scene scene = new Scene(root, 1260, 840);
-// 修改新的 Stage 的属性
+        // 修改新的 Stage 的属性
         titleBarController.setStage(newStage);
         newStage.setScene(scene);
         newStage.show();
@@ -178,14 +174,12 @@ public class Controller {
                 Controller.redraw();
                 CheckPane.controlPane(drawPane,sp);
                 Controller.SelectItem();
-                locateX(NodeList.getRoot());
-                locateY(NodeList.getRoot());
+                posX(NodeList.getRoot(),drawPane);
+                posY(NodeList.getRoot(),drawPane);
 
                 Controller.draw();
-
-
                 try {
-                    MyTreeView.setTreeView();
+                    setTreeView(ap);
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -193,55 +187,27 @@ public class Controller {
             }
         });
     }
-    public void locateX(TreeNode node) {
-        //判断是否为根节点
-        if(node.getPid() != 0) {
-            TreeNode p = new TreeNode();
-            p = NodeList.getParent(node);
-            if(node.getPos()==1) {
-                node.setLeft(p.getLeft() + p.getWidth() + marginX);
-            }else{
-                node.setLeft(p.getLeft() - node.getWidth() - marginX);
-            }
-        }else {
-            node.setLeft(drawPane.getWidth()/2-node.getWidth()/2);
-        }
-        for(int i = 0;i < node.getNodeChildren().size();i++) {
-            locateX(node.getNodeChildren().get(i));
-        }
-
-    }
-
-    public void locateY(TreeNode node) {
-        if(node.getPid() != 0) {
-            TreeNode p = NodeList.getParent(node);
-            //第一个孩子
-            if(NodeList.isFirstChild(node)) {
-                double pchildHeight = NodeList.getChildHeight(p,node.getPos());
-                double childHeight = NodeList.getChildHeight(node,node.getPos());
-                if(node.getNid() == p.getNodeChildren().get(p.getNodeChildren().size()-1).getNid()) {
-                    node.setTop(p.getTop() + p.getHeight()/2 - node.getHeight()/2);
-                }else {
-                    node.setTop(p.getTop() + p.getHeight()/2 - (pchildHeight - childHeight + node.getHeight())/2);
-                }
-            }else{//剩下的孩子
-                TreeNode preChild = NodeList.getPreChild(node);
-                double prechildHeight = NodeList.getChildHeight(preChild,node.getPos());
-                double childHeight = NodeList.getChildHeight(node,node.getPos());
-                node.setTop(preChild.getTop() + preChild.getHeight()/2 +(prechildHeight + childHeight - node.getHeight())/2 + marginY);
-            }
-        }else {//设置根节点的位置
-            node.setTop(drawPane.getHeight()/2-node.getHeight()/2);
-        }
-        for(int i = 0;i < node.getNodeChildren().size();i++) {
-            locateY(node.getNodeChildren().get(i));
-        }
-    }
-
-    //按钮：查找
+    //按钮：撤销，返回上一步
     @FXML
-    void searching(ActionEvent event) {
-
+    void undo(ActionEvent event) {
+        List<TreeNode> list = Deque.undo();
+        if(list!=null) {
+            NodeList.list = list;
+            try {
+                setTreeView(ap);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            redraw();
+            CheckPane.controlPane(drawPane,sp);
+        }
+        son.setDisable(true);
+        brother.setDisable(true);
+        if(NodeList.list.isEmpty()){
+            newNode.setDisable(false);
+            undo.setDisable(true);
+        }
     }
 
     //按钮：保存
@@ -306,6 +272,7 @@ public class Controller {
                 File file=fc.showSaveDialog(stage);
                 if(file==null) return;
                 try {
+                    Zoom.recover(drawPane,sp,ap);
                     DeriveGraph.deriveGraph(file,drawPane);
                 }catch(Exception e) {
                     e.printStackTrace();
@@ -320,6 +287,7 @@ public class Controller {
     void newNode(ActionEvent event) {
         if (NodeList.list.isEmpty()) {
             rootNode = TreeUtil.creatRoot(drawPane,sp);
+            CheckPane.controlPane(drawPane,sp);
             draw();
             try {
                 setTreeView(ap);
@@ -327,8 +295,9 @@ public class Controller {
                 e1.printStackTrace();
             }
             newNode.setDisable(true);
-            son.setDisable(false);
-            brother.setDisable(false);
+            son.setDisable(true);
+            brother.setDisable(true);
+            undo.setDisable(false);
         }
     }
 
@@ -344,11 +313,12 @@ public class Controller {
             son.setDisable(true);
             brother.setDisable(true);
             deleteNode.setDisable(true);
+            undo.setDisable(true);
         }
         SelectItem();
         CheckPane.controlPane(drawPane,sp);
-        posX(NodeList.getRoot());
-        posY(NodeList.getRoot());
+        posX(NodeList.getRoot(),drawPane);
+        posY(NodeList.getRoot(),drawPane);
         try {
             setTreeView(ap);
         } catch (Exception e1) {
@@ -361,8 +331,8 @@ public class Controller {
     void left_layout(ActionEvent event) {
         item = 2;
         SelectItem();
-        posX(NodeList.getRoot());
-        posY(NodeList.getRoot());
+        posX(NodeList.getRoot(),drawPane);
+        posY(NodeList.getRoot(),drawPane);
         CheckPane.controlPane(drawPane,sp);
         draw();
     }
@@ -371,8 +341,8 @@ public class Controller {
     void right_layout(ActionEvent event) {
         item = 3;
         SelectItem();
-        posX(NodeList.getRoot());
-        posY(NodeList.getRoot());
+        posX(NodeList.getRoot(),drawPane);
+        posY(NodeList.getRoot(),drawPane);
         CheckPane.controlPane(drawPane,sp);
         draw();
     }
@@ -382,8 +352,8 @@ public class Controller {
         item = 1;
         SelectItem();
         CheckPane.controlPane(drawPane,sp);
-        posX(NodeList.getRoot());
-        posY(NodeList.getRoot());
+        posX(NodeList.getRoot(),drawPane);
+        posY(NodeList.getRoot(),drawPane);
         draw();
     }
 
@@ -391,19 +361,20 @@ public class Controller {
     void son(ActionEvent event) {
         System.out.println("增加子节点");
         TreeNode node=mouseNode;
-        System.out.println(node.getNid());
-        System.out.println(node.getPid());
-        addNode(node);
+//        System.out.println(node.getNid());
+//        System.out.println(node.getPid());
+        TreeUtil.addNode(node);
         SelectItem();
         CheckPane.controlPane(drawPane,sp);
-        posX(NodeList.getRoot());
-        posY((NodeList.getRoot()));
+        posX(NodeList.getRoot(),drawPane);
+        posY((NodeList.getRoot()),drawPane);
+        draw();
         try {
             setTreeView(ap);
         } catch (Exception e1) {
             e1.printStackTrace();
         }
-        draw();
+
 
     }
 
@@ -416,8 +387,8 @@ public class Controller {
         TreeUtil.addNode(p);
         SelectItem();
         CheckPane.controlPane(drawPane,sp);
-        posX(NodeList.getRoot());
-        posY(NodeList.getRoot());
+        posX(NodeList.getRoot(),drawPane);
+        posY(NodeList.getRoot(),drawPane);
         try {
             setTreeView(ap);
         } catch (Exception e1) {
@@ -450,20 +421,34 @@ public class Controller {
     }
 
     public void initialize() {
-//        draw();
-
+        drawPane.setOnKeyPressed(event -> {
+            if (event.isControlDown()) {
+                if(event.getCode() == KeyCode.EQUALS||event.getCode() == KeyCode.PLUS) {
+                    Zoom.enlarge(drawPane,ap);
+                }
+                if(event.getCode() == KeyCode.MINUS) {
+                    Zoom.reduce(drawPane,ap);
+                }
+                if(event.getCode() == KeyCode.DIGIT0) {
+                    Zoom.recover(drawPane,sp,ap);
+                }
+            }
+        });
         sp.setContent(drawPane);
         drawPane.setMinWidth(1500);
         drawPane.setMinHeight(1000);
+        draw();
         sp.setHvalue(0.5);
         sp.setVvalue(0.5);
         drawPane.getChildren().add(g);
         Click();
         doubleClick();
+        Zoom.zoom(drawPane,ap);
         if(NodeList.list.isEmpty()){
             son.setDisable(true);
             brother.setDisable(true);
             deleteNode.setDisable(true);
+            undo.setDisable(true);
         }
     }
 
@@ -523,7 +508,9 @@ public class Controller {
         //根据当前节点在父节点中的位置关系确认连线的起始点和终点
         if (node.getPos() == 1) {   //如果当前节点在父节点的左侧
             //第一条连线：从父节点右侧中间开始到当前节点左侧中间结束
+            System.out.println("调用了line方法");
             line1.startXProperty().bind(p.layoutXProperty().add(p.widthProperty()));
+            System.out.println("line+"+p.layoutXProperty());
             line1.startYProperty().bind(p.layoutYProperty().add(p.heightProperty().divide(2)));
             line1.endXProperty().bind((p.layoutXProperty().add(p.widthProperty().add(node.layoutXProperty()))).divide(2));
             line1.endYProperty().bind(p.layoutYProperty().add(p.heightProperty().divide(2)));
@@ -541,6 +528,7 @@ public class Controller {
             line3.endYProperty().bind(node.layoutYProperty().add(node.heightProperty().divide(2)));
         } else { //如果当前节点在父节点的右侧
             //第一条连线：从当前节点右侧中间开始到当前节点左侧中间结束
+            System.out.println("调用了line方法");
             line1.startXProperty().bind(node.layoutXProperty().add(node.widthProperty()));
             line1.startYProperty().bind(node.layoutYProperty().add(node.heightProperty().divide(2)));
             line1.endXProperty().bind((node.layoutXProperty().add(node.widthProperty().add(p.layoutXProperty()))).divide(2));
@@ -563,9 +551,9 @@ public class Controller {
         line1.setStroke(Color.web("#d6ecf0"));
         line2.setStroke(Color.web("#d6ecf0"));
         line3.setStroke(Color.web("#d6ecf0"));
-        line1.setStrokeWidth(4);
-        line2.setStrokeWidth(4);
-        line3.setStrokeWidth(4);
+        line1.setStrokeWidth(2);
+        line2.setStrokeWidth(2);
+        line3.setStrokeWidth(2);
 
         //将连线添加到绘图面板中
         g.getChildren().addAll(line1, line2, line3);
@@ -627,29 +615,28 @@ public class Controller {
     public static int marginY = 20;   //表示节点在Y轴上的边距
 
     //用于计算节点在X轴上的位置
-    public void posX(TreeNode node) {
+    public static void posX(TreeNode node,Pane drawPane) {
         //判断是否为根节点，如果不是根节点
         //则获取其父节点并根据节点在父节点中的位置确认当前节点在X轴上的位置
         if (node.getPid() != 0) {
-            TreeNode p = NodeList.getParent(node);
+            TreeNode p = new TreeNode();
+            p=NodeList.getParent(node);
             if (node.getPos() == 1) {
                 node.setLeft(p.getLeft() + p.getWidth() + marginX);
             } else {
                 node.setLeft(p.getLeft() - node.getWidth() - marginX);
             }
         } else {
-            //如果是根节点，
-            //则将当前节点的左边界位置设置为画板宽度的一半减去当前节点宽度的一半，即居中显示
             node.setLeft(drawPane.getWidth() / 2 - node.getWidth() / 2);
         }
         //对当前节点的子节点进行递归调用，计算他们在X轴上的位置
         for (int i = 0; i < node.getNodeChildren().size(); i++) {
-            posX(node.getNodeChildren().get(i));
+            posX(node.getNodeChildren().get(i),drawPane);
         }
     }
 
     //计算节点在Y轴上的位置
-    public void posY(TreeNode node) {
+    public static void posY(TreeNode node,Pane drawPane) {
         if (node.getPid() != 0) { //判断是否为根节点
             TreeNode p = NodeList.getParent(node); //获取父节点
             //第一个孩子
@@ -658,28 +645,22 @@ public class Controller {
                 double childHeight = NodeList.getChildHeight(node, node.getPos()); //获取当前节点在父节点中的高度
                 System.out.println("p1+" + pchildHeight);
                 System.out.println("c2+" + childHeight);
-                //如果当前节点是父节点的最后一个孩子，则将其上边界设置为父节点中向上偏移当前节点高度一半
                 if (node.getNid() == p.getNodeChildren().get(p.getNodeChildren().size() - 1).getNid()) {
                     node.setTop(p.getTop() + p.getHeight() / 2 - node.getHeight() / 2);
-                } else { //否则，计算当前节点上边界位置，时期处于父节点和前一个孩子节点之间
+                } else {
                     node.setTop(p.getTop() + p.getHeight() / 2 - (pchildHeight - childHeight + node.getHeight()) / 2);
                 }
-            } else {//剩下的孩子
-                //获取前一个孩子节点
+            } else {
                 TreeNode preChild = NodeList.getPreChild(node);
-                //计算前一个孩子节点和当前节点在父节点中的高度
                 double preChildHeight = NodeList.getChildHeight(preChild, node.getPos());
                 double childHeight = NodeList.getChildHeight(node, node.getPos());
-                //计算当前节点上边界位置，使其处于前一个孩子节点下方
-                node.setTop(preChild.getTop() + preChild.getHeight() / 2 + (preChildHeight + childHeight - node.getHeight() / 2 + marginY));
+                node.setTop(preChild.getTop() + preChild.getHeight() / 2 + (preChildHeight + childHeight - node.getHeight() )/ 2 + marginY);
             }
-        } else { //设置根节点的位置
-            //将根节点的上边界位置设置为花瓣高度的一般减去根节点高度的一般，即垂直居中显示
+        } else {
             node.setTop(drawPane.getHeight() / 2 - node.getHeight() / 2);
         }
-        //对当前节点的子节点进行递归调用，计算他们在Y轴上的位置
         for (int i = 0; i < node.getNodeChildren().size(); i++) {
-            posY(node.getNodeChildren().get(i));
+            posY(node.getNodeChildren().get(i),drawPane);
         }
     }
 
@@ -712,6 +693,7 @@ public class Controller {
                 son.setDisable(true);
                 brother.setDisable(true);
                 deleteNode.setDisable(true);
+                undo.setDisable(false);
             }
             double x = event.getSceneX();
             double y = event.getSceneY();
@@ -815,13 +797,13 @@ public class Controller {
                     Controller.g.applyCss();
                     Controller.g.layout();
                     CheckPane.controlPane(drawPane,sp);
-                    posX(NodeList.getRoot());
-                    posY(NodeList.getRoot());
-                    Controller.draw();
+                    posX(NodeList.getRoot(),drawPane);
+                    posY(NodeList.getRoot(),drawPane);
+                    draw();
 
                     // 更新TreeView
                     try {
-                        MyTreeView.setTreeView();
+                         setTreeView(ap);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -848,28 +830,6 @@ public class Controller {
      * 管理节点的工具类
      */
 
-    public void creatRoot() {
-        //创建根节点对象，并设置唯一标识和标题
-        TreeNode node = new TreeNode(0, "双击输入");
-        //设置节点的唯一标识id并自增
-        node.setNid(id++);
-        System.out.println("createNode");
-        System.out.println(id);
-        //将根节点添加到绘图面板中，以便显示在页面上
-        Controller.g.getChildren().add(node);
-        //应用CSS样式到该对象及其子节点
-        Controller.g.applyCss();
-        //重新计算和布局对象及其子节点的位置和大小
-        Controller.g.layout();
-
-        //将根节点添加到节点列表中，永固管理所有节点
-        NodeList.list.add(node);
-        //控制面板更新，以便在界面上反映节点的变化
-        //CheckPane.controlPane();
-        node.setLeft(drawPane.getWidth() / 2 - node.getWidth() / 2);
-        node.setTop(drawPane.getHeight() / 2 - node.getHeight() / 2);
-    }
-
     @FXML
     void leftHide(ActionEvent event) {
         leftHide.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, new EventHandler<javafx.scene.input.MouseEvent>() {
@@ -895,52 +855,8 @@ public class Controller {
         });
     }
 
-    public static void addNode(TreeNode p) {
-        TreeNode node = new TreeNode(p.getNid(),"分支主题");
-        node.setNid(id);
-        id++;
-        NodeList.list.add(node);
-        p.getNodeChildren().add(node);
-        g.getChildren().add(node);
-        g.applyCss();
-        g.layout();
-        if(p.getPos()==1) {
-            node.setLeft(p.getLeft() + p.getWidth() + marginX);
-        }else{
-            node.setLeft(p.getLeft() - node.getWidth() - marginX);
-        }
-    }
 
-    public static void deleteNode(TreeNode node) {
-        //删除node父亲孩子list中的的结点
-        //System.out.println(888);
-        TreeNode p = NodeList.getParent(node);
-        System.out.println(p.getNodeChildren().size());
-        for(int i = 0;i < p.getNodeChildren().size();i++) {
-            if(node.getNid() == p.getNodeChildren().get(i).getNid()) {
-                p.getNodeChildren().remove(i);
-                break;
-            }
-        }
-        System.out.println(p.getNodeChildren().size());
-        deleteChildren(node);
 
-    }
-
-    private static void deleteChildren(TreeNode node) {
-        for(int i = 0;i < NodeList.list.size();i++) {
-            if(NodeList.list.get(i).getNid() == node.getNid()) {
-                NodeList.list.remove(i);
-            }
-        }
-        //删除list中node所有的子结点
-        if(!node.getNodeChildren().isEmpty()) {
-            for(int i = 0;i < node.getNodeChildren().size(); i++) {
-                deleteChildren(node.getNodeChildren().get(i));
-            }
-            //System.out.println("孩子不空");
-        }
-    }
     /**
      * 关于布局
      * 居中，左，右布局
@@ -1047,16 +963,10 @@ public class Controller {
         label.setMaxWidth(150); // 设置最大宽度
         label.setPrefWidth(100); // 设置首选宽度
         label.setTextOverrun(OverrunStyle.ELLIPSIS); // 设置文本溢出样式
-
         // 创建根 TreeItem
         TreeItem<Label> root = new TreeItem<Label>(label);
         treeview.setRoot(root); // 设置根节点
 
-        // 如果根节点有图片路径，则在标签文本后添加图片提示
-        if (node.getImagPath() != null) {
-            label.setText(node.getTxt() + "\n" + "(图片)");
-            label.setTextAlignment(TextAlignment.CENTER); // 设置文本居中对齐
-        }
         label.setTextOverrun(OverrunStyle.CENTER_WORD_ELLIPSIS); // 设置文本溢出样式为居中单词省略
         walk(root, node); // 递归构建树形视图
         if (NodeList.list.isEmpty()) {
@@ -1070,8 +980,8 @@ public class Controller {
 
         // 设置 TreeView 的宽度和最小高度
         treeview.setPrefWidth(200);
-        treeview.setMinHeight(570);
-
+        treeview.setMinHeight(620);
+        treeview.setStyle("-fx-background-color:#f9f9f9");
         ap.getChildren().addAll(treeview); // 将 TreeView 添加到 AnchorPane 中
     }
 
@@ -1095,4 +1005,27 @@ public class Controller {
             walk(child, childnode); // 递归构建树形视图
         }
     }
+
+
+    /**
+     * 键盘操作按钮
+     */
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
