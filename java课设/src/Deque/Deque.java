@@ -63,27 +63,16 @@ public class Deque {
         }
     }
 
-        //撤销操作
-    public static List<TreeNode> undo(){
-        //用于临时储存节点信息或者作为返回结果
-        //List为TreeNode类型的动态数组
-        List<TreeNode> list = new ArrayList<>();
-        if(sp>0) {
-            //撤销时，sp-1，并将对应位置的状态数组赋给list
-            sp--;
-            list = arr[sp];
-            return getList(list);
-
-        }
-        return null;
-    }
- //   重做：再次执行之前被撤销的操作
-    public static List<TreeNode> redo(){
-        List<TreeNode> list = new ArrayList<>();
-        if(sp<size-1) {
-            sp++;
-            list = arr[sp];
-            //System.out.println("获得重做状态");
+    //    //撤销操作
+//    public static List<TreeNode> undo(){
+//        //用于临时储存节点信息或者作为返回结果
+//        //List为TreeNode类型的动态数组
+//        List<TreeNode> list = new ArrayList<>();
+//        if(sp>0) {
+//            //撤销时，sp-1，并将对应位置的状态数组赋给list
+//            sp--;
+//            list = arr[sp];
+//            //如果list为空 则按钮不可用，即不可以撤销
 //            if(list.isEmpty()) {
 //                MyButtonBar.b1.setDisable(false);
 //                MyButtonBar.b2.setDisable(true);
@@ -93,11 +82,33 @@ public class Deque {
 //            }else {
 //                MyButtonBar.b1.setDisable(true);
 //            }
-            return getList(list);
-        }
-        return null;
-    }
-//    将节点列表复制到新的列表中，并添加到画布上
+//            //System.out.println("获得撤销状态");
+//            return getList(list);
+//
+//        }
+//        return null;
+//    }
+    //重做：再次执行之前被撤销的操作
+//    public static List<TreeNode> redo(){
+//        List<TreeNode> list = new ArrayList<>();
+//        if(sp<size-1) {
+//            sp++;
+//            list = arr[sp];
+//            //System.out.println("获得重做状态");
+//            if(list.isEmpty()) {
+//                MyButtonBar.b1.setDisable(false);
+//                MyButtonBar.b2.setDisable(true);
+//                MyButtonBar.b3.setDisable(true);
+//                MyButtonBar.b4.setDisable(true);
+//                MyButtonBar.b5.setDisable(true);
+//            }else {
+//                MyButtonBar.b1.setDisable(true);
+//            }
+//            return getList(list);
+//        }
+//        return null;
+//    }
+    //将节点列表复制到新的列表中，并添加到画布上
     private static List<TreeNode> getList(List<TreeNode> list){
         //创建一个新的空列表l，用于存储复制后的节点信息
         List<TreeNode> l =  new ArrayList<>();
@@ -111,6 +122,7 @@ public class Deque {
             n.setTop(list.get(i).getTop());
             n.setTxt(list.get(i).getTxt());
             n.setPos(list.get(i).getPos());
+            n.setImagPath(list.get(i).getImagPath());
             //将节点添加到画布上
             Controller.g.getChildren().add(n);
             Controller.g.applyCss();

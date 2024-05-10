@@ -1,6 +1,6 @@
 package Deque;
 
-import Tree.*;
+import Tree.TreeNode;
 import sample.Controller;
 
 import java.util.ArrayList;
@@ -43,8 +43,8 @@ public class NodeList {
     //获取给定节点的前一个子节点
     public static TreeNode getPreChild(TreeNode node){
         TreeNode p=NodeList.getParent(node);
-//        System.out.println(NodeList.getParent(node));
-//        System.out.println("********");
+        System.out.println(NodeList.getParent(node));
+        System.out.println("********");
         //父节点的第一个节点，父节点的子节点的保存方式用的是list
         TreeNode pre=p.getNodeChildren().get(0);
         for(int i=1;i<p.getNodeChildren().size();i++){

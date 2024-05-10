@@ -17,7 +17,6 @@ public class TreeData extends Label implements java.io.Serializable {
         super(text);      //调用父类Label的构造方法，传入文本内容作为参数
         this.txt=text;    //将文本内容赋值给类成员变量txt
 
-
     }
 
     //无参构造方法

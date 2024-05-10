@@ -17,8 +17,10 @@ public class TreeNode extends TreeData{
     private double left=0;           //节点在界面上的左侧位置
     private double top=0;            //节点在界面上的顶部位置
     private boolean click=false;     //表示当前节点是否被选中
+    public boolean haschangecolor=false;     //表示当前节点是否被修改过颜色
+    public String rgb="d6ecf0";
     private List<TreeNode> nodeChildren =new ArrayList<>();   //存储节点的子节点列表
-
+    public String backgroundColor = String.format("-fx-background-color: %s;", rgb);
     public TreeNode(int pid,String text){
         //将传入的文本设置为节点的内容
         super(text);
@@ -26,8 +28,8 @@ public class TreeNode extends TreeData{
         this.pid=pid;
         //设置节点的样式
         this.setStyle(
-                "-fx-background-color:#FAEBD7;"	+
-                        "-fx-background-radius:10;"+
+                backgroundColor	+
+                        "-fx-background-radius:10px;"+
                         "-fx-padding:10;"
         );
         //设置节点的最大尺寸
@@ -48,8 +50,8 @@ public class TreeNode extends TreeData{
     public TreeNode(){
         super();
         this.setStyle(
-                "-fx-background-color:#FAEBD7;"+
-                        "-fx-background-radius:10;"+
+                backgroundColor+
+                        "-fx-background-radius:10px;"+
                         "-fx-padding:10;"
         );
         //设置节点的最大尺寸
@@ -66,6 +68,7 @@ public class TreeNode extends TreeData{
         this.setFont(new Font("Arial",20));
 
     }
+
 
     public int getPid() {
         return pid;
@@ -111,6 +114,16 @@ public class TreeNode extends TreeData{
         return click;
     }
 
+    public boolean isHaschangecolor(){
+        return haschangecolor;
+    }
+
+    public void setNewColor(String newColor){
+        this.rgb=newColor;
+    }
+    public String getNewColor(){
+        return this.rgb;
+    }
     public void setClick(boolean click) {
         this.click = click;
     }

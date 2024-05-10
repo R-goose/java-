@@ -33,7 +33,7 @@ public class TreeUtil {
         //将根节点添加到节点列表中，永固管理所有节点
         NodeList.list.add(node);
         //控制面板更新，以便在界面上反映节点的变化
-
+        CheckPane.controlPane(drawPane,sp);
         node.setLeft(drawPane.getWidth() / 2 - node.getWidth() / 2);
         node.setTop(drawPane.getHeight() / 2 - node.getHeight() / 2);
         return node;
@@ -47,9 +47,9 @@ public class TreeUtil {
         Controller.g.applyCss();
         Controller.g.layout();
         if(p.getPos()==1) {
-            node.setLeft(p.getLeft() + p.getWidth() + Controller.marginX);
+            node.setLeft(p.getLeft() + p.getWidth() + NodePos.marginX);
         }else{
-            node.setLeft(p.getLeft() - node.getWidth() - Controller.marginX);
+            node.setLeft(p.getLeft() - node.getWidth() - NodePos.marginX);
         }
     }
 
